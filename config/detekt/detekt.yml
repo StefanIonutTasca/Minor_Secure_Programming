@@ -30,26 +30,17 @@ potential-bugs:
   LateinitUsage:
     active: true
 
-security:
-  UnsafeCallOnNullableType:
+# Remove custom security section and use built-in rules
+exceptions:
+  TooGenericExceptionCaught:
     active: true
-  UnsafeCast:
+  TooGenericExceptionThrown:
     active: true
-  ExposedContentProviderSql:
+
+coroutines:
+  RedundantSuspendModifier:
     active: true
-  FilePermission:
+  SuspendFunWithCoroutineScopeReceiver:
     active: true
-  CertificateCheck:
-    active: true
-  HardcodedKey:
-    active: true
-  InsecureRandom:
-    active: true
-  SQLInjection:
-    active: true
-  SSLCertificateVerification:
-    active: true
-  InvalidCipherMode:
-    active: true
-  WebViewJavascriptEnabled:
+  SleepInsteadOfDelay:
     active: true
