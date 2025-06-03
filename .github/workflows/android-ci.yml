@@ -184,7 +184,7 @@ jobs:
           name: dependency-check-report
           path: security-dashboard/dependency-check
           merge-multiple: true
-          if-no-files-found: ignore
+        continue-on-error: true
           
       - name: Download Detekt Results
         uses: actions/download-artifact@v4
@@ -192,7 +192,7 @@ jobs:
           name: detekt-results
           path: security-dashboard/detekt
           merge-multiple: true
-          if-no-files-found: ignore
+        continue-on-error: true
           
       - name: Download Lint Results
         uses: actions/download-artifact@v4
@@ -200,7 +200,7 @@ jobs:
           name: lint-results
           path: security-dashboard/lint
           merge-multiple: true
-          if-no-files-found: ignore
+        continue-on-error: true
           
       - name: Download Test Results
         uses: actions/download-artifact@v4
@@ -208,7 +208,7 @@ jobs:
           name: test-results
           path: security-dashboard/tests
           merge-multiple: true
-          if-no-files-found: ignore
+        continue-on-error: true
           
       - name: Create Index File
         run: |
@@ -250,8 +250,8 @@ jobs:
             <div class="report-section">
               <h2>Test Results</h2>
               <p><span class="status pass">PASSED</span> All tests passed successfully.</p>
-              <h3>Available Reports:</h3>
-              <a class="report-link" href="./tests/index.html">Unit Test Report</a>
+              <h3>Unit Test Reports may be available in the separate test-results artifact.</h3>
+              <p>Note: For a real project, configure your test task to generate HTML reports</p>
             </div>
             
             <div class="report-section">
