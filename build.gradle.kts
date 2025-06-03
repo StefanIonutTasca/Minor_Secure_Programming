@@ -23,13 +23,7 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
-}
+// Repositories are declared in settings.gradle.kts
 
 // Basic tasks for CI/CD demo
 tasks.register("test") {
