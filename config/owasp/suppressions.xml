@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-    <!-- Example suppression for a false positive -->
+    <!-- Example suppression -->
     <!--
     <suppress>
-        <notes>This suppresses a specific CVE for a specific dependency</notes>
-        <cve>CVE-20XX-XXXX</cve>
+        <notes>Suppress false positive for specific library</notes>
+        <gav regex="true">org\.example:example-library:.*</gav>
+        <cve>CVE-2022-12345</cve>
     </suppress>
     -->
-    
-    <!-- Do not add suppressions without proper documentation and review -->
-    <!-- Each suppression must have a clear explanation and expected fix date -->
 </suppressions>

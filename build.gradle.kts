@@ -1,9 +1,9 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.android.application") version "8.1.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.0" apply false
-    id("org.jetbrains.kotlin.jvm") version "1.9.0" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
     id("org.owasp.dependencycheck") version "8.2.1"
     id("org.sonarqube") version "4.2.1.3168"
@@ -15,31 +15,15 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
+        classpath("com.android.tools.build:gradle:8.2.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
-// Repositories are declared in settings.gradle.kts
-
-// Basic tasks for CI/CD demo
-tasks.register("test") {
-    doLast {
-        println("Running tests...")
-        println("All tests passed!")
-    }
-}
-
-tasks.register("lint") {
-    doLast {
-        println("Running lint checks...")
-        println("No lint issues found!")
-    }
-}
-
+// Custom tasks for CI/CD pipeline
 tasks.register("detektCustom") {
     doLast {
         println("Running Detekt static analysis...")
@@ -68,14 +52,6 @@ tasks.register("sonarqubeCustom") {
     }
 }
 
-tasks.register("assembleDebug") {
-    doLast {
-        mkdir("app/build/outputs/apk/debug")
-        File("app/build/outputs/apk/debug/app-debug.apk").writeText("Dummy APK file for testing")
-        println("Debug APK built successfully!")
-    }
-}
-
 detekt {
     buildUponDefaultConfig = true
     allRules = false
@@ -91,7 +67,6 @@ detekt {
 
 // Simplified dependencyCheck configuration to avoid Kotlin DSL syntax issues
 tasks.named("dependencyCheckAnalyze") {
-    // The task is already registered as a dummy task above
     // This is just a placeholder for the real configuration
     // that would be added when the project is fully set up
 }
@@ -110,10 +85,6 @@ sonarqube {
         property("sonar.dependencyCheck.reportPath", "build/reports/dependency-check-report.xml")
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
-}
-
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
 }
 
 subprojects {
