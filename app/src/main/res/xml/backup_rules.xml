@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="file" path="secrets.xml"/>
+    <exclude domain="file" path="secure_preferences.xml"/>
+    <exclude domain="database" path="encrypted_database.db"/>
+</full-backup-content>
