@@ -1,5 +1,6 @@
 package com.example.minor_secure_programming
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class LolStatsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,19 +45,21 @@ class LolStatsActivity : AppCompatActivity() {
         setupFriendCompareButtons()
         
         // Initialize the bottom navigation
-        val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    finish() // Go back to MainActivity
+                R.id.navigation_home -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
                     true
                 }
-                R.id.nav_stats -> {
+                R.id.navigation_lol -> {
                     // Already on stats page
                     true
                 }
-                R.id.nav_profile -> {
-                    // Would navigate to profile page
+                R.id.navigation_dashboard -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 else -> false
@@ -63,7 +67,7 @@ class LolStatsActivity : AppCompatActivity() {
         }
         
         // Set active navigation item
-        bottomNav.selectedItemId = R.id.nav_stats
+        bottomNav.selectedItemId = R.id.navigation_lol
     }
     
     override fun onSupportNavigateUp(): Boolean {

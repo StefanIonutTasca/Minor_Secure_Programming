@@ -2,8 +2,9 @@ package com.example.minor_secure_programming
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -11,29 +12,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
-        // Set up button to navigate to LOL Stats page
-        val btnLolStats = findViewById<Button>(R.id.btnLolStats)
-        btnLolStats.setOnClickListener {
-            val intent = Intent(this, LolStatsActivity::class.java)
-            startActivity(intent)
-        }
+        // Setup card clicks
+        setupCardClicks()
         
         // Initialize the bottom navigation
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    // Already on home page
+                R.id.navigation_home -> {
+                    // Already on home page (dashboard)
                     true
                 }
-                R.id.nav_stats -> {
+                R.id.navigation_lol -> {
                     // Navigate to LOL Stats page
                     val intent = Intent(this, LolStatsActivity::class.java)
                     startActivity(intent)
                     true
                 }
-                R.id.nav_profile -> {
-                    // Would navigate to profile page
+                R.id.navigation_dashboard -> {
+                    // Already on home page (dashboard)
                     true
                 }
                 else -> false
@@ -41,6 +38,32 @@ class MainActivity : AppCompatActivity() {
         }
         
         // Set active navigation item
-        bottomNav.selectedItemId = R.id.nav_home
+        bottomNav.selectedItemId = R.id.navigation_home
     }
+    
+    private fun setupCardClicks() {
+        // Games card
+        findViewById<CardView>(R.id.cardGames).setOnClickListener {
+            val intent = Intent(this, GamesActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Stats card - redirect to LOL Stats for now
+        findViewById<CardView>(R.id.cardStats).setOnClickListener {
+            val intent = Intent(this, LolStatsActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Wellness card - just a toast message for now
+        findViewById<CardView>(R.id.cardWellness).setOnClickListener {
+            Toast.makeText(this, "Wellness features coming soon!", Toast.LENGTH_SHORT).show()
+        }
+        
+        // Settings card
+        findViewById<CardView>(R.id.cardSettings).setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
 }
