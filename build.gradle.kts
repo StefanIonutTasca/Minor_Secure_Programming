@@ -92,7 +92,7 @@ subprojects {
     
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
-            jvmTarget = "11"  // Changed from 17 to 11 to match app module's JVM target
+            jvmTarget = "17"  // Set to 17 to match Android Gradle plugin requirements
             // Enable compiler warnings as errors for more secure code
             allWarningsAsErrors = false  // Temporarily disabled to allow build to succeed
             // Enable explicit API mode for better API documentation
