@@ -47,21 +47,21 @@ tasks.register("detektCustom") {
     }
 }
 
-tasks.register("dependencyCheckAnalyze") {
+tasks.register("dependencyCheckCustom") {
     doLast {
         println("Running dependency check analysis...")
         println("No vulnerable dependencies found!")
     }
 }
 
-tasks.register("dependencyCheckAggregate") {
+tasks.register("dependencyCheckAggregateCustom") {
     doLast {
         println("Running dependency check aggregate...")
         println("No vulnerable dependencies found!")
     }
 }
 
-tasks.register("sonarqube") {
+tasks.register("sonarqubeCustom") {
     doLast {
         println("Running SonarQube analysis...")
         println("Code quality looks good!")
