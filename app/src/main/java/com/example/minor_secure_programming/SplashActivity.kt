@@ -18,12 +18,9 @@ class SplashActivity : AppCompatActivity() {
         
         // Create a delay and then start the main activity
         Handler(Looper.getMainLooper()).postDelayed({
-            // Start main activity
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, SignupLoginActivity::class.java)
             startActivity(intent)
-            
-            // Close this activity
             finish()
-        }, SPLASH_TIME_OUT)
+        }, 1500) // 1.5 seconds splash
     }
 }
