@@ -40,7 +40,7 @@ tasks.register("lint") {
     }
 }
 
-tasks.register("detekt") {
+tasks.register("detektCustom") {
     doLast {
         println("Running Detekt static analysis...")
         println("No code style issues found!")
