@@ -96,12 +96,10 @@ detekt {
 }
 
 dependencyCheck {
-    formats = listOf("HTML", "JSON", "XML")
-    suppressionFile = "$projectDir/config/owasp/suppressions.xml"
-    analyzers {
-        assemblyEnabled = false
-        nodeEnabled = false
-    }
+    formats.set(listOf("HTML", "JSON", "XML"))
+    suppressionFile.set(file("$projectDir/config/owasp/suppressions.xml"))
+    analyzers.assembly.enabled.set(false)
+    analyzers.node.enabled.set(false)
 }
 
 sonarqube {
