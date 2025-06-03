@@ -26,7 +26,9 @@ jobs:
           cache: gradle
 
       - name: OWASP Dependency Check
-        run: ./gradlew dependencyCheckCustom || echo "Dependency check not configured, skipping"
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew dependencyCheckCustom || echo "Dependency check not configured, skipping"
         continue-on-error: true
 
       - name: Upload dependency check report
@@ -37,7 +39,9 @@ jobs:
           if-no-files-found: ignore
 
       - name: Run Detekt
-        run: ./gradlew detektCustom || echo "Detekt not configured, skipping"
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew detektCustom || echo "Detekt not configured, skipping"
         continue-on-error: true
 
       - name: Upload Detekt results
@@ -72,7 +76,9 @@ jobs:
           cache: gradle
 
       - name: Run Lint
-        run: ./gradlew lint || echo "Lint not configured, skipping"
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew lint || echo "Lint not configured, skipping"
         continue-on-error: true
 
       - name: Upload lint results
@@ -86,7 +92,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqubeCustom || echo "SonarQube not configured, skipping"
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew sonarqubeCustom || echo "SonarQube not configured, skipping"
         continue-on-error: true
 
   test:
@@ -107,7 +115,9 @@ jobs:
           cache: gradle
 
       - name: Run Unit Tests
-        run: ./gradlew test || echo "Tests not configured, skipping"
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew test || echo "Tests not configured, skipping"
         continue-on-error: true
 
       - name: Upload test results
@@ -147,7 +157,9 @@ jobs:
           cache: gradle
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          ./gradlew assembleDebug
         continue-on-error: true
 
       - name: Upload Debug Artifacts
