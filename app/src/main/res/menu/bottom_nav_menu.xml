@@ -5,9 +5,9 @@
         android:icon="@android:drawable/ic_menu_compass"
         android:title="Home" />
     <item
-        android:id="@+id/navigation_lol"
+        android:id="@+id/navigation_wellness"
         android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="LOL Stats" />
+        android:title="Wellness" />
     <item
         android:id="@+id/navigation_dashboard"
         android:icon="@android:drawable/ic_menu_myplaces"

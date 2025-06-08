@@ -58,8 +58,8 @@ class SettingsActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                R.id.navigation_lol -> {
-                    val intent = Intent(this, LolStatsActivity::class.java)
+                R.id.navigation_wellness -> {
+                    val intent = Intent(this, WellnessActivity::class.java)
                     startActivity(intent)
                     true
                 }
