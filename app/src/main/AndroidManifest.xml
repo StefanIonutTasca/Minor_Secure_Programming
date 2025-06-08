@@ -64,6 +64,20 @@
         <receiver
             android:name=".PostureReminderReceiver"
             android:exported="false" />
+
+        <activity
+            android:name=".AccountSettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".SettingsActivity" />
+            
+        <activity 
+            android:name=".ChangeUsernameActivity"
+            android:exported="false" />
+            
+        <activity 
+            android:name=".ExportDataActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

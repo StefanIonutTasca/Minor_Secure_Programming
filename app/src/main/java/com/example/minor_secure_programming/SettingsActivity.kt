@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.cardview.widget.CardView
+
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,20 +37,23 @@ class SettingsActivity : AppCompatActivity() {
         dataCollectionSwitch.setOnCheckedChangeListener { _, isChecked ->
             Toast.makeText(this, "Data collection ${if (isChecked) "enabled" else "disabled"}", Toast.LENGTH_SHORT).show()
         }
-        
-        // Set up button listeners
-        findViewById<Button>(R.id.btnChangeUsername).setOnClickListener {
-            Toast.makeText(this, "Change username functionality would open here", Toast.LENGTH_SHORT).show()
-        }
-        
-        findViewById<Button>(R.id.btnExportData).setOnClickListener {
-            Toast.makeText(this, "Export data functionality would open here", Toast.LENGTH_SHORT).show()
-        }
+
         
         findViewById<Button>(R.id.btnPrivacyPolicy).setOnClickListener {
             Toast.makeText(this, "Privacy policy would open here", Toast.LENGTH_SHORT).show()
         }
-        
+
+        // Inside onCreate()
+        findViewById<CardView>(R.id.cardAccount).setOnClickListener {
+            startActivity(Intent(this, AccountSettingsActivity::class.java))
+        }
+
+        // Logout button
+        findViewById<Button>(R.id.btnLogout).setOnClickListener {
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
+        }
+
+
         // Initialize the bottom navigation
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
         bottomNav.setOnItemSelectedListener { item ->
