@@ -23,9 +23,9 @@ class MainActivity : AppCompatActivity() {
                     // Already on home page (dashboard)
                     true
                 }
-                R.id.navigation_lol -> {
-                    // Navigate to LOL Stats page
-                    val intent = Intent(this, LolStatsActivity::class.java)
+                R.id.navigation_wellness -> {
+                    // Navigate to Wellness page
+                    val intent = Intent(this, WellnessActivity::class.java)
                     startActivity(intent)
                     true
                 }
@@ -54,9 +54,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         
-        // Wellness card - just a toast message for now
+        // Wellness card - navigate to Wellness activity
         findViewById<CardView>(R.id.cardWellness).setOnClickListener {
-            Toast.makeText(this, "Wellness features coming soon!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, WellnessActivity::class.java)
+            startActivity(intent)
         }
         
         // Settings card
