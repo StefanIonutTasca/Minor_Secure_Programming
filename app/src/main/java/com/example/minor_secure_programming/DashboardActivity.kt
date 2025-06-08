@@ -32,7 +32,8 @@ class DashboardActivity : AppCompatActivity() {
         }
         
         findViewById<CardView>(R.id.cardWellness).setOnClickListener {
-            // In a real app, navigate to wellness section
+            val intent = Intent(this, WellnessActivity::class.java)
+            startActivity(intent)
         }
         
         findViewById<CardView>(R.id.cardSettings).setOnClickListener {
@@ -49,8 +50,8 @@ class DashboardActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                R.id.navigation_lol -> {
-                    val intent = Intent(this, LolStatsActivity::class.java)
+                R.id.navigation_wellness -> {
+                    val intent = Intent(this, WellnessActivity::class.java)
                     startActivity(intent)
                     true
                 }

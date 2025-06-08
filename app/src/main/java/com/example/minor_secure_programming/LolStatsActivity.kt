@@ -53,7 +53,7 @@ class LolStatsActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                R.id.navigation_lol -> {
+                R.id.navigation_wellness -> {
                     // Already on stats page
                     true
                 }
@@ -67,7 +67,7 @@ class LolStatsActivity : AppCompatActivity() {
         }
         
         // Set active navigation item
-        bottomNav.selectedItemId = R.id.navigation_lol
+        bottomNav.selectedItemId = R.id.navigation_wellness
     }
     
     override fun onSupportNavigateUp(): Boolean {
