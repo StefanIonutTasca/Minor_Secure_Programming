@@ -179,11 +179,14 @@
 
             <!-- Account Settings -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="2dp">
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -198,23 +201,23 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <Button
-                        android:id="@+id/btnChangeUsername"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Change Username" />
-
-                    <Button
-                        android:id="@+id/btnExportData"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Export My Data" />
+                        android:text="Change username and export data"
+                        android:textColor="#888"
+                        android:paddingTop="4dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnLogout"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Logout" />
+
 
             <TextView
                 android:layout_width="match_parent"
