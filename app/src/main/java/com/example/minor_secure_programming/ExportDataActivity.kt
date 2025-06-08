@@ -26,8 +26,8 @@ class ExportDataActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     startActivity(Intent(this, MainActivity::class.java)); true
                 }
-                R.id.navigation_lol -> {
-                    startActivity(Intent(this, LolStatsActivity::class.java)); true
+                R.id.navigation_wellness -> {
+                    startActivity(Intent(this, WellnessActivity::class.java)); true
                 }
                 R.id.navigation_dashboard -> {
                     startActivity(Intent(this, MainActivity::class.java)); true

@@ -42,6 +42,12 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun setupCardClicks() {
+        // User Profile card - navigate to Account Settings
+        findViewById<CardView>(R.id.userProfileCard).setOnClickListener {
+            val intent = Intent(this, AccountSettingsActivity::class.java)
+            startActivity(intent)
+        }
+        
         // Games card
         findViewById<CardView>(R.id.cardGames).setOnClickListener {
             val intent = Intent(this, GamesActivity::class.java)
