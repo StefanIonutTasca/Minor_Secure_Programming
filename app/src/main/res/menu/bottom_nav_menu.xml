@@ -9,7 +9,7 @@
         android:icon="@android:drawable/ic_menu_sort_by_size"
         android:title="Wellness" />
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_cv"
         android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Dashboard" />
+        android:title="CV" />
 </menu>

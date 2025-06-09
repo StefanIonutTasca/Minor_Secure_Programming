@@ -4,24 +4,27 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
-import org.json.JSONArray
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.json.JSONArray
 
-class LolStatsActivity : AppCompatActivity() {
+class ValorantStatsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_lol_stats)
+        setContentView(R.layout.activity_valorant_stats_new)
         
         // Setup action bar with back button
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "League of Legends Stats"
+        supportActionBar?.title = "Valorant Stats"
+        
+        // Get username from intent if available
+        val username = intent.getStringExtra("username") ?: "User123"
+        findViewById<TextView>(R.id.usernameText).text = "Username: $username"
         
         // Set up compare stats button click
         findViewById<Button>(R.id.btnCompareStats).setOnClickListener {
@@ -29,24 +32,23 @@ class LolStatsActivity : AppCompatActivity() {
             
             // In a real app, this would navigate to a comparison screen
             // For this demo, we'll just scroll to the friends section
-            findViewById<View>(R.id.friendsCard).requestFocus()
+            findViewById<androidx.cardview.widget.CardView>(R.id.friendsCard).requestFocus()
         }
         
         // Set up remove game button
         findViewById<Button>(R.id.btnRemoveGame).setOnClickListener {
             // Get the username from the intent extras
-            val username = intent.getStringExtra("USERNAME") ?: "Unknown"
-            val gameName = "League of Legends"
+            val gameName = "Valorant"
             showRemoveGameConfirmation(gameName, username)
         }
         
         // Set up compare with new person button
         findViewById<Button>(R.id.btnSearch).setOnClickListener {
-            val username = findViewById<EditText>(R.id.searchFriend).text.toString()
-            if (username.isNotEmpty()) {
+            val searchUsername = findViewById<EditText>(R.id.searchFriend).text.toString()
+            if (searchUsername.isNotEmpty()) {
                 // In a real app, this would fetch the user's stats and compare
                 // For this demo, we'll show a comparison dialog
-                showComparisonDialog(username)
+                showComparisonDialog(searchUsername)
             } else {
                 Toast.makeText(this, "Please enter a username to compare with", Toast.LENGTH_SHORT).show()
             }
@@ -65,7 +67,7 @@ class LolStatsActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_wellness -> {
-                    // Already on stats page
+                    // Already on wellness/stats page
                     true
                 }
                 R.id.navigation_cv -> {
@@ -89,7 +91,7 @@ class LolStatsActivity : AppCompatActivity() {
     private fun setupFriendCompareButtons() {
         // For a real app, we would dynamically create these buttons or use RecyclerView
         // For this demo, we'll find all the buttons in the layout with a simple approach
-        val friendsCard = findViewById<View>(R.id.friendsCard) as androidx.cardview.widget.CardView
+        val friendsCard = findViewById<androidx.cardview.widget.CardView>(R.id.friendsCard)
         val linearLayout = friendsCard.getChildAt(0) as android.widget.LinearLayout
         
         // Start at index 2 to skip the title and search box
@@ -170,11 +172,11 @@ class LolStatsActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Stats Comparison")
             .setMessage("Comparing your stats with $username:\n\n" +
-                       "Wins: You (72) vs $username (85)\n" +
-                       "Losses: You (53) vs $username (62)\n" +
-                       "KDA: You (3.2) vs $username (3.8)\n" +
-                       "CS/min: You (6.8) vs $username (7.2)\n" +
-                       "Vision Score: You (22) vs $username (28)")
+                       "Matches: You (131) vs $username (156)\n" +
+                       "Win Rate: You (52%) vs $username (57%)\n" +
+                       "K/D/A: You (1.6/0.9/4.2) vs $username (1.9/0.7/5.3)\n" +
+                       "Headshot %: You (38%) vs $username (42%)\n" +
+                       "Favorite Agent: You (Jett) vs $username (Reyna)")
             .setPositiveButton("Close") { dialog, _ -> dialog.dismiss() }
             .setNeutralButton("View Full Details") { _, _ ->
                 Toast.makeText(this, "Full comparison details would open here", Toast.LENGTH_SHORT).show() 

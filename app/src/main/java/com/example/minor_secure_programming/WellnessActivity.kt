@@ -275,8 +275,30 @@ class WellnessActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         tvBreaksTaken.text = "Breaks taken: 0"
         tvPostureReminders.text = "Posture reminders acknowledged: 0"
         
-        // Bottom navigation removed
-        // Navigation now uses navigation_wellness instead of navigation_lol
+        // Initialize the bottom navigation
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_wellness -> {
+                    // Already on wellness page
+                    true
+                }
+                R.id.navigation_cv -> {
+                    val intent = Intent(this, CVActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
+        }
+        
+        // Set the active item in the bottom navigation
+        bottomNav.selectedItemId = R.id.navigation_wellness
     }
     
     override fun onSupportNavigateUp(): Boolean {

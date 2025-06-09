@@ -8,4 +8,8 @@
         android:id="@+id/navigation_wellness"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Wellness" />
+    <item
+        android:id="@+id/navigation_cv"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="CV" />
 </menu>
