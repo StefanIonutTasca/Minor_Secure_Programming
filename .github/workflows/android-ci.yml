@@ -63,9 +63,8 @@ jobs:
         
       - name: Run MobSF Scan
         run: |
-          mobsfscan . --json --output mobsfscan-results.json || true
-          # Non-zero exit is expected when security issues are found
-          echo "MobSF scan completed - security findings may have been identified"
+          mobsfscan . --json --output mobsfscan-results.json
+        continue-on-error: true
         
       - name: Upload MobSF results
         uses: actions/upload-artifact@v4
