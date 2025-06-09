@@ -1,3 +1,48 @@
 <resources>
     <string name="app_name">Minor_Secure_Programming</string>
+    
+    <!-- Games Activity -->
+    <string name="games_list_title">Games List</string>
+    <string name="search_hint">Search</string>
+    <string name="new_game">New Game</string>
+    
+    <!-- Add Game Activity -->
+    <string name="add_new_game">Add New Game</string>
+    <string name="select_game">Select Game</string>
+    <string name="select_game_description">Choose which game you\'d like to add</string>
+    <string name="username">Username</string>
+    <string name="username_description">Enter your username for this game</string>
+    <string name="username_hint">Username</string>
+    <string name="add_game_button">Add Game</string>
+    <string name="form_validation_hint">Fill in both fields above to enable the Add Game button</string>
+    
+    <!-- Game Categories -->
+    <string name="category_all_games">All Games</string>
+    <string name="category_moba">MOBA</string>
+    <string name="category_fps">FPS</string>
+    <string name="category_battle_royale">Battle Royale</string>
+    <string name="category_strategy">Strategy</string>
+    
+    <!-- Game Names -->
+    <string name="game_league_of_legends">League of Legends</string>
+    <string name="game_dota_2">Dota 2</string>
+    <string name="game_rainbow_six_siege">Rainbow Six: Siege</string>
+    <string name="game_overwatch">Overwatch</string>
+    <string name="game_smite">Smite</string>
+    <string name="game_arena_of_valor">Arena of Valor</string>
+    <string name="game_battlerite">Battlerite</string>
+    
+    <!-- Toast Messages -->
+    <string name="coming_soon">%1$s stats coming soon!</string>
+    <string name="game_added">Added %1$s with username: %2$s</string>
+    <string name="sorting_by_name">Sorting by name...</string>
+    <string name="sorting_by_date">Sorting by date added...</string>
+    <string name="refreshing_games">Refreshing games list...</string>
+    
+    <!-- Menu Options -->
+    <string name="menu_options">Menu Options</string>
+    <string name="sort_by_name">Sort by Name</string>
+    <string name="sort_by_date_added">Sort by Date Added</string>
+    <string name="refresh">Refresh</string>
+    <string name="settings">Settings</string>
 </resources>
