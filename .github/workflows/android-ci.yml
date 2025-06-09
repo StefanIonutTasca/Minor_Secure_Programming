@@ -51,12 +51,19 @@ jobs:
           path: build/reports/detekt/
           if-no-files-found: ignore
 
-      # MobSF action temporarily disabled due to availability issues
-      #- name: MobSF Security Analysis
-      #  uses: MobSF/mobsfscan-action@main
-      #  with:
-      #    output-format: json
-      #    output-file: mobsf-results.json
+      - name: MobSF Security Analysis
+        uses: MobSF/mobsfscan-action@main
+        with:
+          output-format: json
+          output-file: mobsf-results.json
+        continue-on-error: true
+
+      - name: Upload MobSF results
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobsf-scan-results
+          path: mobsf-results.json
+          if-no-files-found: ignore
 
   static-analysis:
     name: Static Code Analysis
@@ -160,7 +167,6 @@ jobs:
         run: |
           export JAVA_HOME=$JAVA_HOME_17_X64
           ./gradlew assembleDebug
-        continue-on-error: true
 
       - name: Upload Debug Artifacts
         uses: actions/upload-artifact@v4
