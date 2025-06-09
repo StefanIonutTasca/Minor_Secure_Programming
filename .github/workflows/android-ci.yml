@@ -52,7 +52,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: MobSF Security Analysis
-        uses: MobSF/mobsfscan-action@main
+        uses: MobSF/mobsfscan-action@v0.3
         with:
           output-format: json
           output-file: mobsf-results.json
