@@ -20,24 +20,24 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    // Already on home page (dashboard)
+                    // Already on home page
                     true
                 }
                 R.id.navigation_wellness -> {
-                    // Navigate to Wellness page
                     val intent = Intent(this, WellnessActivity::class.java)
                     startActivity(intent)
                     true
                 }
-                R.id.navigation_dashboard -> {
-                    // Already on home page (dashboard)
+                R.id.navigation_cv -> {
+                    val intent = Intent(this, CVActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 else -> false
             }
         }
         
-        // Set active navigation item
+        // Set the active item in the bottom navigation
         bottomNav.selectedItemId = R.id.navigation_home
     }
     

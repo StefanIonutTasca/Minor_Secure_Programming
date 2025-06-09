@@ -78,6 +78,21 @@
         <activity 
             android:name=".ExportDataActivity"
             android:exported="false" />
+            
+        <activity 
+            android:name=".CVActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+            
+        <activity 
+            android:name=".R6StatsActivity"
+            android:exported="false"
+            android:parentActivityName=".GamesActivity" />
+            
+        <activity 
+            android:name=".ValorantStatsActivity"
+            android:exported="false"
+            android:parentActivityName=".GamesActivity" />
 
     </application>
 

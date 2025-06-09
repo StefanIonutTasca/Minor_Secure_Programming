@@ -27,8 +27,9 @@
                 android:id="@+id/profileImage"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:contentDescription="Player Profile"
-                android:src="@mipmap/ic_launcher_round"
+                android:contentDescription="League of Legends Logo"
+                android:src="@drawable/league"
+                android:scaleType="fitCenter"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -52,6 +53,17 @@
                 android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@+id/profileImage"
                 app:layout_constraintTop_toBottomOf="@+id/gameTitleText" />
+                
+            <Button
+                android:id="@+id/btnRemoveGame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@android:color/holo_red_light"
+                android:text="Remove Game"
+                android:textColor="@android:color/white"
+                app:layout_constraintStart_toStartOf="@+id/usernameText"
+                app:layout_constraintTop_toBottomOf="@+id/usernameText" />
 
             <View
                 android:id="@+id/divider"
@@ -379,7 +391,10 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -88,8 +88,8 @@ class SettingsActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                R.id.navigation_dashboard -> {
-                    val intent = Intent(this, MainActivity::class.java)
+                R.id.navigation_cv -> {
+                    val intent = Intent(this, CVActivity::class.java)
                     startActivity(intent)
                     true
                 }
