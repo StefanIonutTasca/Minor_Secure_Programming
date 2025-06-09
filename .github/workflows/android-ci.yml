@@ -261,6 +261,7 @@ jobs:
               <h3>Available Reports:</h3>
               <a class="report-link" href="./dependency-check/dependency-check-report.html">OWASP Dependency Check Report</a>
               <a class="report-link" href="./detekt/detekt.html">Detekt Security Analysis Report</a>
+              <a class="report-link" href="./mobsf/mobsfscan-results.json">MobSF Security Scan Report (JSON)</a>
             </div>
             
             <div class="report-section">
