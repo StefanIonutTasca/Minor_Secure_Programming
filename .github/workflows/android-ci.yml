@@ -63,8 +63,9 @@ jobs:
         
       - name: Run MobSF Scan
         run: |
-          mobsfscan . --json --output mobsfscan-results.json
-        continue-on-error: true
+          mobsfscan . --json --output mobsfscan-results.json || true
+          # Non-zero exit is expected when security issues are found
+          echo "MobSF scan completed - security findings may have been identified"
         
       - name: Upload MobSF results
         uses: actions/upload-artifact@v4
@@ -213,6 +214,14 @@ jobs:
         with:
           name: lint-results
           path: security-dashboard/lint
+          merge-multiple: true
+        continue-on-error: true
+          
+      - name: Download MobSF Results
+        uses: actions/download-artifact@v4
+        with:
+          name: mobsf-scan-results
+          path: security-dashboard/mobsf
           merge-multiple: true
         continue-on-error: true
           
