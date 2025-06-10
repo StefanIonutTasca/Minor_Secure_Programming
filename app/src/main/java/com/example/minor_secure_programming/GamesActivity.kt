@@ -20,11 +20,19 @@ import org.json.JSONObject
 class GamesActivity : AppCompatActivity() {
     // List of available games with categories
     private val gameCategories = mapOf(
-        "FPS" to listOf("Rainbow Six Siege", "Valorant", "CS:GO", "Apex Legends"),
+        "FPS" to listOf("Rainbow Six Siege", "Valorant", "CS:GO", "Apex Legends", "Overwatch"),
         "MOBA" to listOf("League of Legends", "Dota 2"),
         "MMO" to listOf("World of Warcraft", "Old School RuneScape"),
         "Battle Royale" to listOf("Fortnite", "Apex Legends"),
         "Sandbox" to listOf("Minecraft")
+    )
+    // games With StatsScreen created
+    private val gamesWithStatsScreen = setOf(
+        "Rainbow Six Siege",
+        "Valorant",
+        "League of Legends",
+        "Old School RuneScape",
+        "Overwatch"
     )
     
     // Flattened list of all games for the spinner
@@ -119,22 +127,27 @@ class GamesActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
-                // Get user inputs
                 val selectedGame = gameSpinner.selectedItem?.toString() ?: ""
-                val username = dialogView.findViewById<EditText>(R.id.editTextUsername).text.toString()
-                
-                // Validate inputs
-                if (username.isNotEmpty() && selectedGame.isNotEmpty()) {
-                    addGameToList(selectedGame, username)
-                    saveGame(selectedGame, username)
-                } else {
+                val username     = dialogView.findViewById<EditText>(R.id.editTextUsername).text.toString()
+
+                if (selectedGame.isBlank() || username.isBlank()) {
                     Toast.makeText(this, "Please enter a username and select a game", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
                 }
+
+                // If we DON'T have a stats screen, just show message and stop
+                if (!gamesWithStatsScreen.contains(selectedGame)) {
+                    Toast.makeText(this, "$selectedGame stats coming soon!", Toast.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+
+                // Otherwise proceed normally
+                addGameToList(selectedGame, username)
+                saveGame(selectedGame, username)
             }
             .setNegativeButton("Cancel", null)
             .create()
-        
-        dialog.show()
+            .show()
     }
     
     /**
@@ -180,6 +193,8 @@ class GamesActivity : AppCompatActivity() {
                 "Valorant" -> setImageResource(R.drawable.valorant)
                 "Dota 2" -> setImageResource(R.drawable.dota2)
                 "CS:GO", "Counter-Strike: Global Offensive" -> setImageResource(R.drawable.cs_go)
+                "Old School RuneScape" -> setImageResource(R.drawable.osrs)
+                "Overwatch" -> setImageResource(R.drawable.overwatch)
                 else -> setImageResource(android.R.drawable.ic_menu_slideshow) // Generic icon for other games
             }
             scaleType = ImageView.ScaleType.FIT_CENTER
@@ -260,6 +275,16 @@ class GamesActivity : AppCompatActivity() {
                 "League of Legends" -> {
                     val intent = Intent(this, LolStatsActivity::class.java)
                     intent.putExtra("USERNAME", username)
+                    startActivity(intent)
+                }
+                "Old School RuneScape" -> {
+                    val intent = Intent(this, OsrsStatsActivity::class.java)
+                    intent.putExtra("USERNAME", username)
+                    startActivity(intent)
+                }
+                "Overwatch" -> {
+                    val intent = Intent(this, OverwatchStatsActivity::class.java)
+                    intent.putExtra("USERNAME", username)   // battletag
                     startActivity(intent)
                 }
                 else -> {

@@ -94,6 +94,16 @@
             android:exported="false"
             android:parentActivityName=".GamesActivity" />
 
+        <activity
+            android:name=".OsrsStatsActivity"
+            android:exported="false"
+            android:parentActivityName=".GamesActivity" />
+
+        <activity
+            android:name=".OverwatchStatsActivity"
+            android:exported="false"
+            android:parentActivityName=".GamesActivity" />
+
     </application>
 
 </manifest>
