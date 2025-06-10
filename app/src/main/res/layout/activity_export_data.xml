@@ -4,46 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GamesActivity">
+    tools:context=".ExportDataActivity">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation">
 
         <LinearLayout
-            android:id="@+id/gamesContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="30dp">
 
             <TextView
-                android:id="@+id/gamesTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="My Games"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:text="Export your data as a file. This include profile, settings, or game logs."
+                android:textSize="16sp"
+                android:layout_marginBottom="16dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddGame"
+            <Button
+                android:id="@+id/btnExportNow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Add New Game"
-                android:textAllCaps="false"
-                app:cornerRadius="8dp"
-                app:icon="@android:drawable/ic_input_add"
-                app:iconGravity="textStart" />
-
-            <!-- Games will be added here dynamically -->
-
-            <!-- All games will be added dynamically based on user's saved games -->
+                android:text="Export Now" />
         </LinearLayout>
     </ScrollView>
 
@@ -52,8 +38,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav_menu" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,7 +32,8 @@ class SignupLoginActivity : AppCompatActivity() {
             val password = passwordInput.text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                val intent = Intent(this, DashboardActivity::class.java)
+                // Navigate to MainActivity (Dashboard) instead of DashboardActivity
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
             } else {

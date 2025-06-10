@@ -16,11 +16,14 @@ class SplashActivity : AppCompatActivity() {
         // Hide action bar if it exists
         supportActionBar?.hide()
         
-        // Create a delay and then start the main activity
+        // Create a delay and then start the login activity
         Handler(Looper.getMainLooper()).postDelayed({
+            // Start login activity
             val intent = Intent(this, SignupLoginActivity::class.java)
             startActivity(intent)
+            
+            // Close this activity
             finish()
-        }, 1500) // 1.5 seconds splash
+        }, SPLASH_TIME_OUT)
     }
 }

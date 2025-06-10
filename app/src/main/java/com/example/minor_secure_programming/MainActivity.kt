@@ -20,28 +20,34 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    // Already on home page (dashboard)
+                    // Already on home page
                     true
                 }
-                R.id.navigation_lol -> {
-                    // Navigate to LOL Stats page
-                    val intent = Intent(this, LolStatsActivity::class.java)
+                R.id.navigation_wellness -> {
+                    val intent = Intent(this, WellnessActivity::class.java)
                     startActivity(intent)
                     true
                 }
-                R.id.navigation_dashboard -> {
-                    // Already on home page (dashboard)
+                R.id.navigation_cv -> {
+                    val intent = Intent(this, CVActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 else -> false
             }
         }
         
-        // Set active navigation item
+        // Set the active item in the bottom navigation
         bottomNav.selectedItemId = R.id.navigation_home
     }
     
     private fun setupCardClicks() {
+        // User Profile card - navigate to Account Settings
+        findViewById<CardView>(R.id.userProfileCard).setOnClickListener {
+            val intent = Intent(this, AccountSettingsActivity::class.java)
+            startActivity(intent)
+        }
+        
         // Games card
         findViewById<CardView>(R.id.cardGames).setOnClickListener {
             val intent = Intent(this, GamesActivity::class.java)
@@ -54,9 +60,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         
-        // Wellness card - just a toast message for now
+        // Wellness card - navigate to Wellness activity
         findViewById<CardView>(R.id.cardWellness).setOnClickListener {
-            Toast.makeText(this, "Wellness features coming soon!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, WellnessActivity::class.java)
+            startActivity(intent)
         }
         
         // Settings card
