@@ -8,8 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.minor_secure_programming.utils.SupabaseManager
+import kotlinx.coroutines.launch
 
 class SignupLoginActivity : AppCompatActivity() {
 
@@ -89,40 +92,58 @@ class SignupLoginActivity : AppCompatActivity() {
 
         // Login/Signup logic
         loginSignupButton.setOnClickListener {
-            val username = usernameInput.text.toString()
+            val username = usernameInput.text.toString() // Using as email for Supabase auth
             val password = passwordInput.text.toString()
             val useBiometrics = useBiometricsCheckbox.isChecked
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                sharedPreferences.edit()
-                    .putString("username", username)
-                    .putString("password", password)
-                    .apply()
-
+                // Show loading indicator
+                loginSignupButton.isEnabled = false
+                loginSignupButton.text = if (isLogin) "Logging in..." else "Signing up..."
+                
+                // Store preferences for biometrics later
                 if (useBiometrics) {
-                    val biometricManager = BiometricManager.from(this)
-                    when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
-                        BiometricManager.BIOMETRIC_SUCCESS -> {
-                            biometricPrompt.authenticate(promptInfo)
+                    sharedPreferences.edit()
+                        .putString("username", username)
+                        .apply()
+                }
+                
+                // Authenticate with Supabase
+                if (isLogin) {
+                    // Login
+                    SupabaseManager.signIn(username, password, 
+                        onSuccess = {
+                            loginSignupButton.isEnabled = true
+                            loginSignupButton.text = "Login"
+                            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+                            
+                            // Handle biometric setup if needed
+                            handleBiometricSetup(useBiometrics)
+                        },
+                        onError = { e ->
+                            loginSignupButton.isEnabled = true
+                            loginSignupButton.text = "Login"
+                            Toast.makeText(this, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
                         }
-                        BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                            Toast.makeText(this, "No biometrics enrolled. Please enroll or use password login.", Toast.LENGTH_LONG).show()
-                            val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL)
-                            startActivity(enrollIntent)
-                        }
-                        BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
-                        BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                            Toast.makeText(this, "Biometric hardware not available.", Toast.LENGTH_LONG).show()
-                            goToMain() // fallback
-                        }
-                        else -> {
-                            Toast.makeText(this, "Biometric authentication not supported.", Toast.LENGTH_LONG).show()
-                            goToMain() // fallback
-                        }
-                    }
+                    )
                 } else {
-                    // Proceed with password only
-                    goToMain()
+                    // Sign up
+                    SupabaseManager.signUp(username, password,
+                        onSuccess = {
+                            loginSignupButton.isEnabled = true
+                            loginSignupButton.text = "Sign Up"
+                            Toast.makeText(this, "Sign up successful! Please verify your email if required.", Toast.LENGTH_LONG).show()
+                            
+                            // Switch to login mode
+                            isLogin = true
+                            updateUI()
+                        },
+                        onError = { e ->
+                            loginSignupButton.isEnabled = true
+                            loginSignupButton.text = "Sign Up"
+                            Toast.makeText(this, "Sign up failed: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                    )
                 }
             } else {
                 Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show()
@@ -138,5 +159,34 @@ class SignupLoginActivity : AppCompatActivity() {
     private fun goToMain() {
         startActivity(Intent(this@SignupLoginActivity, MainActivity::class.java))
         finish()
+    }
+    
+    private fun handleBiometricSetup(useBiometrics: Boolean) {
+        if (useBiometrics) {
+            val biometricManager = BiometricManager.from(this)
+            when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
+                BiometricManager.BIOMETRIC_SUCCESS -> {
+                    biometricPrompt.authenticate(promptInfo)
+                }
+                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                    Toast.makeText(this, "No biometrics enrolled. Please enroll or use password login.", Toast.LENGTH_LONG).show()
+                    val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL)
+                    startActivity(enrollIntent)
+                    goToMain() // Continue anyway
+                }
+                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                    Toast.makeText(this, "Biometric hardware not available.", Toast.LENGTH_LONG).show()
+                    goToMain() // fallback
+                }
+                else -> {
+                    Toast.makeText(this, "Biometric authentication not supported.", Toast.LENGTH_LONG).show()
+                    goToMain() // fallback
+                }
+            }
+        } else {
+            // Proceed without biometrics
+            goToMain()
+        }
     }
 }

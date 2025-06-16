@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/src/main/java/com/example/minor_secure_programming/utils/Constants.kt
