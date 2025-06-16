@@ -2,12 +2,15 @@ package com.example.minor_secure_programming
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import java.util.concurrent.atomic.AtomicReference
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -20,7 +23,7 @@ import org.json.JSONObject
 class GamesActivity : AppCompatActivity() {
     // List of available games with categories
     private val gameCategories = mapOf(
-        "FPS" to listOf("Rainbow Six Siege", "Valorant", "CS:GO", "Apex Legends"),
+        "FPS" to listOf("Rainbow Six Siege", "Valorant", "CS:GO", "Apex Legends", "Overwatch 2"),
         "MOBA" to listOf("League of Legends", "Dota 2"),
         "MMO" to listOf("World of Warcraft", "Old School RuneScape"),
         "Battle Royale" to listOf("Fortnite", "Apex Legends"),
@@ -87,6 +90,53 @@ class GamesActivity : AppCompatActivity() {
     /**
      * Shows dialog for adding a new game
      */
+    /**
+     * Check for game-specific fields and add them to the input container
+     */
+    private fun checkForGameSpecificFields(spinner: Spinner, container: LinearLayout, steamIdFieldRef: AtomicReference<EditText?>) {
+        val selectedGame = spinner.selectedItem?.toString() ?: ""
+        
+        // Remove any previously added game-specific fields
+        // Skip index 0 as that's the username field which is part of the layout
+        while (container.childCount > 1) {
+            container.removeViewAt(1)
+        }
+        steamIdFieldRef.set(null)
+        
+        // Add game-specific fields
+        if (selectedGame.equals("Dota 2", ignoreCase = true)) {
+            // Create Steam ID field for DOTA 2
+            val newSteamIdField = EditText(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = dpToPx(8)
+                }
+                hint = "Enter your Steam ID (e.g., 86745912)"
+                inputType = InputType.TYPE_CLASS_NUMBER
+                id = View.generateViewId()
+            }
+            container.addView(newSteamIdField)
+            steamIdFieldRef.set(newSteamIdField)
+            
+            // Add helper text explaining how to find Steam ID
+            val helperText = TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = dpToPx(4)
+                }
+                text = "Find your Steam ID in your Steam profile URL or from third-party sites"
+                setTextColor(Color.GRAY)
+                textSize = 12f
+            }
+            container.addView(helperText)
+        }
+
+    }
+    
     private fun showAddGameDialog() {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_game, null)
         
@@ -102,6 +152,16 @@ class GamesActivity : AppCompatActivity() {
                       gameCategories[categories[0]]?.toTypedArray() ?: emptyArray())
         gameSpinner.adapter = gameAdapter
         
+        // Get the layout container to add extra fields dynamically
+        val inputContainer = dialogView.findViewById<LinearLayout>(R.id.inputContainer)
+        
+        // Add username field (already in XML layout)
+        val usernameField = dialogView.findViewById<EditText>(R.id.editTextUsername)
+        
+        // Variable to hold the Steam ID field (for DOTA 2)
+        // Using AtomicReference to avoid smart cast issues with closures
+        val steamIdFieldRef = AtomicReference<EditText?>(null)
+        
         // Update games when category changes
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
@@ -110,31 +170,74 @@ class GamesActivity : AppCompatActivity() {
                 gameAdapter = ArrayAdapter(this@GamesActivity, 
                            android.R.layout.simple_spinner_dropdown_item, gamesInCategory)
                 gameSpinner.adapter = gameAdapter
+                
+                // Reset UI when category changes
+                checkForGameSpecificFields(gameSpinner, inputContainer, steamIdFieldRef)
             }
             
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
         
+        // Listen for game selection changes to add game-specific fields
+        gameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                checkForGameSpecificFields(gameSpinner, inputContainer, steamIdFieldRef)
+            }
+            
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+        
+        // Initial check for game-specific fields
+        checkForGameSpecificFields(gameSpinner, inputContainer, steamIdFieldRef)
+        
         // Create dialog
         val dialog = AlertDialog.Builder(this)
+            .setTitle("Add Game")
             .setView(dialogView)
-            .setPositiveButton("Add") { _, _ ->
-                // Get user inputs
-                val selectedGame = gameSpinner.selectedItem?.toString() ?: ""
-                val username = dialogView.findViewById<EditText>(R.id.editTextUsername).text.toString()
-                
-                // Validate inputs
-                if (username.isNotEmpty() && selectedGame.isNotEmpty()) {
-                    addGameToList(selectedGame, username)
-                    saveGame(selectedGame, username)
-                } else {
-                    Toast.makeText(this, "Please enter a username and select a game", Toast.LENGTH_SHORT).show()
-                }
-            }
+            .setPositiveButton("Add", null) // Set to null initially to prevent auto-dismiss
             .setNegativeButton("Cancel", null)
             .create()
         
+        // Set the dialog to show
         dialog.show()
+        
+        // Override the positive button to handle validation
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            // Get user inputs
+            val selectedGame = gameSpinner.selectedItem?.toString() ?: ""
+            val username = usernameField.text.toString()
+            
+            // Validate inputs based on game type
+            when {
+                username.isEmpty() -> {
+                    Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show()
+                }
+                selectedGame.equals("Dota 2", ignoreCase = true) && steamIdFieldRef.get()?.text.toString().isNullOrEmpty() -> {
+                    Toast.makeText(this, "Please enter your Steam ID for DOTA 2", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // All validation passed
+                    val gameData = mutableMapOf<String, String>()
+                    gameData["username"] = username
+                    
+                    // Add game-specific data
+                    if (selectedGame.equals("Dota 2", ignoreCase = true)) {
+                        val field = steamIdFieldRef.get()
+                        if (field != null) {
+                            val steamId = field.text.toString()
+                            gameData["steamId"] = steamId
+                        }
+                    }
+                    
+                    // Add game to list and save
+                    addGameToList(selectedGame, username)
+                    saveGame(selectedGame, gameData)
+                    
+                    // Dismiss dialog after successful validation
+                    dialog.dismiss()
+                }
+            }
+        }
     }
     
     /**
@@ -262,6 +365,16 @@ class GamesActivity : AppCompatActivity() {
                     intent.putExtra("USERNAME", username)
                     startActivity(intent)
                 }
+                "Dota 2" -> {
+                    val intent = Intent(this, DotaStatsActivity::class.java)
+                    intent.putExtra("USERNAME", username)
+                    startActivity(intent)
+                }
+                "Overwatch 2" -> {
+                    val intent = Intent(this, OverwatchStatsActivity::class.java)
+                    intent.putExtra("USERNAME", username)
+                    startActivity(intent)
+                }
                 else -> {
                     Toast.makeText(this, "$gameName stats coming soon!", Toast.LENGTH_SHORT).show()
                 }
@@ -273,43 +386,40 @@ class GamesActivity : AppCompatActivity() {
     }
     
     /**
-     * Save game data to SharedPreferences
+     * Save game to storage
+     */
+    private fun saveGame(gameName: String, gameData: Map<String, String>) {
+        val sharedPref = getSharedPreferences("games", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        
+        // Convert the map to a JSON string for storage
+        val jsonData = JSONObject()
+        for ((key, value) in gameData) {
+            jsonData.put(key, value)
+        }
+        
+        editor.putString(gameName, jsonData.toString())
+        editor.apply()
+        
+        // Get the username for display purposes
+        val username = gameData["username"] ?: ""
+        Toast.makeText(this, "$gameName added to your profile with username: $username", Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * Legacy method for backward compatibility
      */
     private fun saveGame(gameName: String, username: String) {
-        val sharedPrefs = getSharedPreferences("user_games", Context.MODE_PRIVATE)
-        val gamesJson = sharedPrefs.getString("games", "[]") ?: "[]"
-        
-        try {
-            val gamesArray = JSONArray(gamesJson)
-            
-            // Find the game's category
-            var gameCategory = ""
-            for ((category, games) in gameCategories) {
-                if (games.contains(gameName)) {
-                    gameCategory = category
-                    break
-                }
-            }
-            
-            val gameObject = JSONObject().apply {
-                put("name", gameName)
-                put("username", username)
-                put("category", gameCategory)
-            }
-            gamesArray.put(gameObject)
-            
-            // Save updated array
-            sharedPrefs.edit().putString("games", gamesArray.toString()).apply()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error saving game data", Toast.LENGTH_SHORT).show()
-        }
+        // For backward compatibility
+        val data = mapOf("username" to username)
+        saveGame(gameName, data)
     }
     
     /**
      * Load saved games from SharedPreferences
      */
     private fun loadSavedGames() {
-        val sharedPrefs = getSharedPreferences("user_games", Context.MODE_PRIVATE)
+        val sharedPrefs = getSharedPreferences("games", Context.MODE_PRIVATE)
         val gamesJson = sharedPrefs.getString("games", "[]") ?: "[]"
         
         try {
@@ -391,7 +501,7 @@ class GamesActivity : AppCompatActivity() {
             text = category
             textSize = 20f
             setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(resources.getColor(android.R.color.holo_blue_dark))
+            setTextColor(resources.getColor(android.R.color.holo_blue_dark, theme))
         }
         gamesContainer.addView(headerView)
         
