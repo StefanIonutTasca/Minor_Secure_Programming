@@ -14,408 +14,412 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:animateLayoutChanges="true">
-
-        <!-- Game title card -->
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:animateLayoutChanges="true">
 
-            <LinearLayout
+            <!-- Game title card -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:contentDescription="Overwatch 2 Logo" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal">
 
-                        <TextView
+                        <ImageView
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:src="@mipmap/ic_launcher"
+                            android:contentDescription="Overwatch 2 Logo" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Overwatch 2"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="FPS - Blizzard Entertainment"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/btn_remove_overwatch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Overwatch 2"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="FPS - Blizzard Entertainment"
-                            android:textSize="14sp" />
-
+                            android:text="Remove"
+                            android:backgroundTint="#FF5722" />
                     </LinearLayout>
 
-                    <Button
-                        android:id="@+id/btn_remove_overwatch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Remove"
-                        android:backgroundTint="#FF5722" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="#E0E0E0" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Player Search -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Search Player"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="Enter Battletag (e.g., Felix-11257)">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_overwatch_battletag"
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#E0E0E0" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <Button
-                    android:id="@+id/btn_search_overwatch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Search"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Player Stats Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_player_stats"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
+            <!-- Player Stats Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_player_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                android:visibility="visible"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:id="@+id/img_player_avatar"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:contentDescription="Player Avatar" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:id="@+id/tv_player_name"
+                        <ImageView
+                            android:id="@+id/img_player_avatar"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:layout_marginEnd="16dp"
+                            android:src="@drawable/ic_launcher_foreground"
+                            android:contentDescription="Player Avatar" />
+
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Player Name"
-                            android:textSize="20sp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_player_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Player Name"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/tv_player_level"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Level: 0"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/tv_endorsement"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Endorsement: 0"
+                                android:textSize="16sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Player Career Stats -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Player Stats Summary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+
+                    <LinearLayout
+                        android:id="@+id/layout_quickplay_stats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp">
+
+                        <!-- Stats will be added here programmatically -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Quick Play"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:id="@+id/tv_player_level"
+                            android:id="@+id/tv_qp_games_played"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Level: 0"
-                            android:textSize="16sp"/>
+                            android:text="Games Played: 0"/>
 
                         <TextView
-                            android:id="@+id/tv_endorsement"
+                            android:id="@+id/tv_qp_games_won"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Endorsement: 0"
-                            android:textSize="16sp"/>
+                            android:text="Wins: 0"/>
+
+                        <TextView
+                            android:id="@+id/tv_qp_games_lost"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Losses: 0"/>
+
+                        <TextView
+                            android:id="@+id/tv_qp_win_percentage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Win %: 0"/>
+                            
+                        <TextView
+                            android:id="@+id/tv_qp_eliminations"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Eliminations: 0"/>
+                            
+                        <TextView
+                            android:id="@+id/tv_qp_deaths"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Deaths: 0"/>
+                            
+                        <TextView
+                            android:id="@+id/tv_qp_damage_done"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Damage Done: 0"/>
+
+                        <TextView
+                            android:id="@+id/tv_qp_time_played"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Time Played: 0"/>
                     </LinearLayout>
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"/>
-
-                <!-- Player Career Stats -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Player Stats Summary"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-
-                <LinearLayout
-                    android:id="@+id/layout_quickplay_stats"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="8dp">
-
-                    <!-- Stats will be added here programmatically -->
-                    <TextView
-                        android:id="@+id/tv_qp_games_played"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Games Played: 0"/>
-
-                    <TextView
-                        android:id="@+id/tv_qp_wins"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Wins: 0"/>
-                        
-                    <TextView
-                        android:id="@+id/tv_qp_games_lost"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Losses: 0"/>
-                        
-                    <TextView
-                        android:id="@+id/tv_qp_win_percentage"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Win %: 0"/>
-                        
-                    <TextView
-                        android:id="@+id/tv_qp_eliminations"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Eliminations: 0"/>
-                        
-                    <TextView
-                        android:id="@+id/tv_qp_deaths"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Deaths: 0"/>
-                        
-                    <TextView
-                        android:id="@+id/tv_qp_damage_done"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Damage Done: 0"/>
-
-                    <TextView
-                        android:id="@+id/tv_qp_time_played"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Time Played: 0"/>
-                </LinearLayout>
-
-                <!-- No competitive stats section as we now show overall career stats -->
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Friends for Comparison -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_friends"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
+            <!-- Player Search -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Friends"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
-                
-                <LinearLayout
-                    android:id="@+id/container_friends"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="8dp">
-                    
-                    <!-- Friend items will be added here dynamically -->
-                    <TextView
-                        android:id="@+id/tv_no_friends"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="No friends compared yet"
-                        android:textStyle="italic"/>
-                </LinearLayout>
-                
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="16dp">
-                    
+                    android:padding="16dp">
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Search for friend"
-                        android:textSize="16sp"
+                        android:text="Search Player"
+                        android:textSize="20sp"
                         android:textStyle="bold"/>
-                    
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:hint="Enter Battletag (e.g., User-1234)">
+                        android:hint="Enter Battletag (e.g., Felix-11257)">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_friend_battletag"
+                            android:id="@+id/et_overwatch_battletag"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="text" />
+                            android:inputType="text"/>
                     </com.google.android.material.textfield.TextInputLayout>
-                    
+
                     <Button
-                        android:id="@+id/btn_search_friend"
+                        android:id="@+id/btn_search_overwatch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Search Friend" />
+                        android:text="Search"/>
                 </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        
-        <!-- Compare with Pro Player -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            </androidx.cardview.widget.CardView>
 
-            <LinearLayout
+            <!-- Friends for Comparison -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_friends"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Compare with Pro Player"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
-
-                <Spinner
-                    android:id="@+id/spinner_pro_players"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" />
-
-                <Button
-                    android:id="@+id/btn_compare"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Compare Stats"
-                    android:enabled="false"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Comparison Results -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_comparison"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Comparison Results"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
-                    android:id="@+id/layout_comparison_results"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="8dp">
+                    android:padding="16dp">
 
-                    <!-- Comparison results will be added here programmatically -->
                     <TextView
-                        android:id="@+id/tv_comparison_placeholder"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select a pro player to compare stats"
-                        android:textStyle="italic"/>
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                        android:text="Friends"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+                    
+                    <LinearLayout
+                        android:id="@+id/container_friends"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp">
+                        
+                        <!-- Friend items will be added here dynamically -->
+                        <TextView
+                            android:id="@+id/tv_no_friends"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No friends compared yet"
+                            android:textStyle="italic"/>
+                    </LinearLayout>
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp">
+                        
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Search for friend"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+                        
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="Enter Battletag (e.g., User-1234)">
 
-    </LinearLayout>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_friend_battletag"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        
+                        <Button
+                            android:id="@+id/btn_search_friend"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Search Friend" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            
+            <!-- Compare with Pro Player -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Compare with Pro Player"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <Spinner
+                        android:id="@+id/spinner_pro_players"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" />
+
+                    <Button
+                        android:id="@+id/btn_compare"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Compare Stats"
+                        android:enabled="false"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Comparison Results -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_comparison"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Comparison Results"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <LinearLayout
+                        android:id="@+id/layout_comparison_results"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp">
+
+                        <!-- Comparison results will be added here programmatically -->
+                        <TextView
+                            android:id="@+id/tv_comparison_placeholder"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Select a pro player to compare stats"
+                            android:textStyle="italic"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
     </ScrollView>
     
     <com.google.android.material.bottomnavigation.BottomNavigationView

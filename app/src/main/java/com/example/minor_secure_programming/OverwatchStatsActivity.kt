@@ -24,6 +24,10 @@ class OverwatchStatsActivity : AppCompatActivity() {
     private lateinit var apiService: ApiService
     private lateinit var sharedPreferences: SharedPreferences
     
+    // Game data
+    private var gameUsername: String = ""
+    private var gameId: String? = null
+    
     // Constant for SharedPreferences
     companion object {
         private const val PREFS_NAME = "OverwatchPrefs"
@@ -104,6 +108,23 @@ class OverwatchStatsActivity : AppCompatActivity() {
         
         // Load last compared player from preferences
         loadLastComparedPlayer()
+        
+        // Get game data from intent
+        gameUsername = intent.getStringExtra("USERNAME") ?: ""
+        gameId = intent.getStringExtra("GAME_ID")
+        
+        // Set remove button action
+        btnRemove.setOnClickListener {
+            showRemoveConfirmationDialog()
+        }
+        
+        // Automatically load player stats if we have a username
+        if (gameUsername.isNotEmpty()) {
+            // Format username for Overwatch API (replace # with -)
+            val formattedUsername = gameUsername.replace("#", "-")
+            // Auto-load player stats
+            searchPlayer(formattedUsername)
+        }
     }
     
     private fun initializeUI() {
@@ -120,7 +141,7 @@ class OverwatchStatsActivity : AppCompatActivity() {
         
         // Stats views
         tvGamesPlayed = findViewById(R.id.tv_qp_games_played)
-        tvGamesWon = findViewById(R.id.tv_qp_wins)
+        tvGamesWon = findViewById(R.id.tv_qp_games_won)
         tvGamesLost = findViewById(R.id.tv_qp_games_lost)
         tvWinPercentage = findViewById(R.id.tv_qp_win_percentage)
         tvEliminations = findViewById(R.id.tv_qp_eliminations)
@@ -195,11 +216,6 @@ class OverwatchStatsActivity : AppCompatActivity() {
      * Set up all button click listeners
      */
     private fun setupButtonClickListeners() {
-        // Remove button
-        btnRemove.setOnClickListener {
-            showRemoveConfirmationDialog()
-        }
-        
         // Search button
         btnSearch.setOnClickListener {
             val battletag = etBattletag.text.toString().trim()
