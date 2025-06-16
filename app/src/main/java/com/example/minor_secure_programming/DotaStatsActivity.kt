@@ -19,7 +19,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.minor_secure_programming.api.ApiService
+import com.example.minor_secure_programming.utils.SupabaseManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.json.JSONArray
@@ -28,6 +30,7 @@ class DotaStatsActivity : AppCompatActivity() {
     
     private lateinit var apiService: ApiService
     private val TAG = "DotaStatsActivity"
+    private var gameId: String? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +52,9 @@ class DotaStatsActivity : AppCompatActivity() {
             setupFriendCompareButtons()
         }, 200)
         
-        // Get stored game data
+        // Get stored game data from intent
         val username = intent.getStringExtra("USERNAME") ?: ""
+        gameId = intent.getStringExtra("GAME_ID")
         val steamId = getStoredSteamId(username)
         
         // Set up remove game button
@@ -183,8 +187,11 @@ class DotaStatsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 // Show loading state
-                val loadingToast = Toast.makeText(this@DotaStatsActivity, "Loading profile for $playerIdOrName...", Toast.LENGTH_SHORT)
-                loadingToast.show()
+                val loadingSnackbar = Snackbar.make(
+                    findViewById(android.R.id.content),
+                    "Loading profile for $playerIdOrName...",
+                    Snackbar.LENGTH_INDEFINITE
+                ).apply { show() }
                 
                 // Get player profile data from API
                 val result = apiService.getDotaPlayerProfile(playerIdOrName)
@@ -194,8 +201,35 @@ class DotaStatsActivity : AppCompatActivity() {
                     val profileData = response?.optJSONObject("data")
                     
                     if (profileData != null) {
+                        // Update UI with the fetched data
                         updateUIWithPlayerData(profileData)
-                        loadingToast.cancel()
+                        loadingSnackbar.dismiss()
+                        
+                        // Save to Supabase if we have a game ID
+                        gameId?.let { id ->
+                            val statsResult = SupabaseManager.saveGameStats(id, profileData)
+                            if (statsResult.isSuccess) {
+                                Snackbar.make(
+                                    findViewById(android.R.id.content),
+                                    "Player stats saved successfully!",
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                                
+                                // Also fetch and save recent matches
+                                fetchAndSaveRecentMatches(playerIdOrName, id)
+                            } else {
+                                val error = statsResult.exceptionOrNull()
+                                Log.e(TAG, "Failed to save stats: ${error?.message}", error)
+                                Snackbar.make(
+                                    findViewById(android.R.id.content),
+                                    "Profile displayed but couldn't save stats",
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                        } ?: run {
+                            // No game ID available
+                            Log.w(TAG, "No game ID available to save stats")
+                        }
                     } else {
                         showError("Failed to parse player data")
                     }
@@ -204,13 +238,53 @@ class DotaStatsActivity : AppCompatActivity() {
                     showError("Error: ${error?.message ?: "Unknown error"}")
                     Log.e(TAG, "API error", error)
                 }
+                loadingSnackbar.dismiss()
             } catch (e: Exception) {
                 showError("Error: ${e.message ?: "Unknown error"}")
                 Log.e(TAG, "Exception in fetchAndDisplayPlayerProfile", e)
             }
         }
     }
-    
+
+    /**
+     * Fetch player's recent matches and save them to the database
+     */
+    private fun fetchAndSaveRecentMatches(playerId: String, gameId: String) {
+        lifecycleScope.launch {
+            try {
+                // Get player's recent matches (last 5)
+                val result = apiService.getDotaPlayerMatches(playerId, 5)
+                
+                if (result.isSuccess) {
+                    val matchesArray = result.getOrNull()
+                    
+                    if (matchesArray != null) {
+                        // Create a combined JSON object with profile and matches data
+                        val combinedStats = JSONObject().apply {
+                            put("recent_matches", matchesArray)
+                            put("last_updated", System.currentTimeMillis())
+                        }
+                        
+                        // Save the matches data to Supabase
+                        val saveResult = SupabaseManager.saveGameStats(gameId, combinedStats)
+                        
+                        if (saveResult.isSuccess) {
+                            Log.d(TAG, "Successfully saved recent matches data")
+                        } else {
+                            val error = saveResult.exceptionOrNull()
+                            Log.e(TAG, "Failed to save recent matches: ${error?.message}", error)
+                        }
+                    }
+                } else {
+                    val error = result.exceptionOrNull()
+                    Log.e(TAG, "Error fetching recent matches: ${error?.message}", error)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception in fetchAndSaveRecentMatches", e)
+            }
+        }
+    }
+
     private fun updateUIWithPlayerData(profileData: JSONObject) {
         try {
             // Extract player info

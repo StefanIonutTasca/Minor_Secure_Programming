@@ -23,6 +23,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Utility class for managing Supabase authentication
@@ -327,6 +331,65 @@ object SupabaseManager : CoroutineScope {
         } catch (e: Exception) {
             Log.e("SupabaseClient", "Error deleting game: ${e.message}", e)
             false
+        }
+    }
+    
+    /**
+     * Save game statistics to Supabase
+     * @param gameId UUID of the game to save stats for
+     * @param statsData JSONObject containing the game statistics
+     * @return Result object with success/failure status
+     */
+    suspend fun saveGameStats(gameId: String, statsData: JSONObject): Result<Boolean> {
+        return try {
+            val user = client.auth.currentUserOrNull() ?: return Result.failure(Exception("User not authenticated"))
+            
+            // First check if stats already exist for this game
+            val existingStats = client.postgrest.from("game_stats")
+                .select() {
+                    filter {
+                        eq("game_id", gameId)
+                    }
+                }
+                .decodeList<JsonObject>()
+            
+            // Format current timestamp for Postgres compatible format
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+            val now = sdf.format(Date())
+            
+            if (existingStats.isEmpty()) {
+                // Insert new stats
+                client.postgrest.from("game_stats")
+                    .insert(JsonObject(buildMap {
+                        put("game_id", JsonPrimitive(gameId))
+                        put("stats_data", JsonPrimitive(statsData.toString()))
+                        put("last_refreshed", JsonPrimitive(now))
+                    }))
+                
+                Log.d("SupabaseClient", "Inserted new game stats")
+                Result.success(true)
+            } else {
+                // Update existing stats
+                val existingStatId = existingStats[0]["id"]?.jsonPrimitive?.content
+                    ?: return Result.failure(Exception("Failed to get existing stat ID"))
+                
+                client.postgrest.from("game_stats")
+                    .update(JsonObject(buildMap {
+                        put("stats_data", JsonPrimitive(statsData.toString()))
+                        put("last_refreshed", JsonPrimitive(now))
+                        put("updated_at", JsonPrimitive(now))
+                    })) {
+                        filter {
+                            eq("id", existingStatId)
+                        }
+                    }
+                
+                Log.d("SupabaseClient", "Updated existing game stats")
+                Result.success(true)
+            }
+        } catch (e: Exception) {
+            Log.e("SupabaseClient", "Error saving game stats: ${e.message}", e)
+            Result.failure(e)
         }
     }
     
