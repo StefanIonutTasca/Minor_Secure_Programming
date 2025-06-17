@@ -20,7 +20,7 @@
         android:text="Select a category:" />
 
     <Spinner
-        android:id="@+id/spinnerCategories"
+        android:id="@+id/spinnerGameCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" />
@@ -32,7 +32,7 @@
         android:text="Select a game:" />
 
     <Spinner
-        android:id="@+id/spinnerGames"
+        android:id="@+id/spinnerGameName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" />
@@ -43,20 +43,12 @@
         android:layout_marginBottom="8dp"
         android:text="Your in-game username:" />
         
-    <LinearLayout
-        android:id="@+id/inputContainer"
+    <EditText
+        android:id="@+id/editTextUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        
-        <EditText
-            android:id="@+id/editTextUsername"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter your username"
-            android:inputType="text"
-            android:layout_marginBottom="8dp" />
-        
-    </LinearLayout>
+        android:hint="Enter your username"
+        android:inputType="text"
+        android:layout_marginBottom="8dp" />
 
 </LinearLayout>

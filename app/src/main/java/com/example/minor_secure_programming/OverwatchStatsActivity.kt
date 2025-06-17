@@ -24,6 +24,10 @@ class OverwatchStatsActivity : AppCompatActivity() {
     private lateinit var apiService: ApiService
     private lateinit var sharedPreferences: SharedPreferences
     
+    // Game data
+    private var gameUsername: String = ""
+    private var gameId: String? = null
+    
     // Constant for SharedPreferences
     companion object {
         private const val PREFS_NAME = "OverwatchPrefs"
@@ -39,7 +43,6 @@ class OverwatchStatsActivity : AppCompatActivity() {
     // UI Components
     private lateinit var etBattletag: TextInputEditText
     private lateinit var btnSearch: Button
-    private lateinit var btnBack: Button
     private lateinit var btnRemove: Button
     private lateinit var btnCompare: Button
     
@@ -105,11 +108,27 @@ class OverwatchStatsActivity : AppCompatActivity() {
         
         // Load last compared player from preferences
         loadLastComparedPlayer()
+        
+        // Get game data from intent
+        gameUsername = intent.getStringExtra("USERNAME") ?: ""
+        gameId = intent.getStringExtra("GAME_ID")
+        
+        // Set remove button action
+        btnRemove.setOnClickListener {
+            showRemoveConfirmationDialog()
+        }
+        
+        // Automatically load player stats if we have a username
+        if (gameUsername.isNotEmpty()) {
+            // Format username for Overwatch API (replace # with -)
+            val formattedUsername = gameUsername.replace("#", "-")
+            // Auto-load player stats
+            searchPlayer(formattedUsername)
+        }
     }
     
     private fun initializeUI() {
         // Buttons
-        btnBack = findViewById(R.id.btn_back_overwatch)
         btnRemove = findViewById(R.id.btn_remove_overwatch)
         btnSearch = findViewById(R.id.btn_search_overwatch)
         btnCompare = findViewById(R.id.btn_compare)
@@ -122,7 +141,7 @@ class OverwatchStatsActivity : AppCompatActivity() {
         
         // Stats views
         tvGamesPlayed = findViewById(R.id.tv_qp_games_played)
-        tvGamesWon = findViewById(R.id.tv_qp_wins)
+        tvGamesWon = findViewById(R.id.tv_qp_games_won)
         tvGamesLost = findViewById(R.id.tv_qp_games_lost)
         tvWinPercentage = findViewById(R.id.tv_qp_win_percentage)
         tvEliminations = findViewById(R.id.tv_qp_eliminations)
@@ -158,46 +177,45 @@ class OverwatchStatsActivity : AppCompatActivity() {
      * Set up navigation listeners
      */
     private fun setupNavigationListeners() {
-        // Setup bottom navigation
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
-        bottomNav.setOnItemSelectedListener { item ->
-            when(item.itemId) {
-                R.id.navigation_home -> {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    true
+        try {
+            // Setup bottom navigation if it exists
+            val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+            if (bottomNav != null) {
+                bottomNav.setOnItemSelectedListener { item ->
+                    when(item.itemId) {
+                        R.id.navigation_home -> {
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            true
+                        }
+                        R.id.navigation_wellness -> {
+                            // Already on stats page
+                            true
+                        }
+                        R.id.navigation_cv -> {
+                            val intent = Intent(this, CVActivity::class.java)
+                            startActivity(intent)
+                            true
+                        }
+                        else -> false
+                    }
                 }
-                R.id.navigation_wellness -> {
-                    // Already on stats page
-                    true
-                }
-                R.id.navigation_cv -> {
-                    val intent = Intent(this, CVActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                else -> false
+                
+                // Set active navigation item
+                bottomNav.selectedItemId = R.id.navigation_wellness
+            } else {
+                // Bottom navigation is not in this layout, log and continue
+                Log.d("OverwatchStats", "Bottom navigation view not found in layout")
             }
+        } catch (e: Exception) {
+            Log.e("OverwatchStats", "Error setting up navigation: ${e.message}")
         }
-        
-        // Set active navigation item
-        bottomNav.selectedItemId = R.id.navigation_wellness
     }
     
     /**
      * Set up all button click listeners
      */
     private fun setupButtonClickListeners() {
-        // Back button
-        btnBack.setOnClickListener {
-            finish()
-        }
-        
-        // Remove button
-        btnRemove.setOnClickListener {
-            showRemoveConfirmationDialog()
-        }
-        
         // Search button
         btnSearch.setOnClickListener {
             val battletag = etBattletag.text.toString().trim()
