@@ -29,6 +29,13 @@
                 android:text="My Games"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+                
+            <ProgressBar
+                android:id="@+id/progressBarGames"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddGame"

@@ -2,11 +2,16 @@ package com.example.minor_secure_programming
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.minor_secure_programming.utils.SupabaseManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
 
 class ChangeUsernameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +37,28 @@ class ChangeUsernameActivity : AppCompatActivity() {
                     Toast.makeText(this, "Usernames do not match", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    Toast.makeText(this, "Username saved: $username", Toast.LENGTH_SHORT).show()
-                    // Add saving logic here
+                    // Show progress and disable button
+                    val progressBar = findViewById<ProgressBar>(R.id.progressBarUsername)
+                    progressBar.visibility = View.VISIBLE
+                    saveButton.isEnabled = false
+                    
+                    // Update username in Supabase
+                    lifecycleScope.launch {
+                        val success = SupabaseManager.updateUsername(username)
+                        
+                        runOnUiThread {
+                            progressBar.visibility = View.GONE
+                            saveButton.isEnabled = true
+                            
+                            if (success) {
+                                Toast.makeText(this@ChangeUsernameActivity, "Username updated successfully!", Toast.LENGTH_SHORT).show()
+                                setResult(RESULT_OK)
+                                finish()
+                            } else {
+                                Toast.makeText(this@ChangeUsernameActivity, "Failed to update username. Please try again.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
             }
         }
