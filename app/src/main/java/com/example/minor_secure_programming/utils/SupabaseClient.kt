@@ -400,4 +400,59 @@ object SupabaseManager : CoroutineScope {
     fun initialize(context: Context) {
         Log.d("SupabaseClient", "Initialized Supabase client")
     }
+    
+    /**
+     * Signs the user out of their current session
+     * @return Result indicating success or failure
+     */
+    suspend fun signOut(): Result<Unit> {
+        return try {
+            client.auth.signOut()
+            Log.d("SupabaseClient", "User signed out successfully")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("SupabaseClient", "Error signing out: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Retrieves game stats from the database for a specific game
+     * @param gameId The ID of the game to retrieve stats for
+     * @return Result containing a JSONObject with the game stats or an exception if retrieval failed
+     */
+    suspend fun getGameStats(gameId: String): Result<JSONObject> {
+        return try {
+            val user = client.auth.currentUserOrNull() ?: return Result.failure(Exception("User not authenticated"))
+            
+            // Query game stats for this game ID
+            val stats = client.postgrest.from("game_stats")
+                .select() {
+                    filter {
+                        eq("game_id", gameId)
+                    }
+                }
+                .decodeList<JsonObject>()
+            
+            if (stats.isEmpty()) {
+                return Result.failure(Exception("No stats found for this game"))
+            }
+            
+            // Get the first stats record
+            val statsData = stats[0]
+            val statsJson = statsData["stats_data"]?.jsonPrimitive?.content
+            
+            if (statsJson != null) {
+                // Parse the stats JSON string
+                val jsonObject = JSONObject(statsJson)
+                Result.success(jsonObject)
+            } else {
+                Result.failure(Exception("Stats data is empty or null"))
+            }
+            
+        } catch (e: Exception) {
+            Log.e("SupabaseClient", "Error retrieving game stats: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
 }

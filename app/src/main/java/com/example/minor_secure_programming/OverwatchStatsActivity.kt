@@ -12,8 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import com.example.minor_secure_programming.api.ApiService
+import com.example.minor_secure_programming.utils.SupabaseManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.NumberFormat
@@ -516,6 +518,52 @@ class OverwatchStatsActivity : AppCompatActivity() {
                             
                             // Enable compare button
                             btnCompare.isEnabled = true
+                            
+                            // Save to Supabase if we have a game ID
+                            gameId?.let { id ->
+                                // Show saving indicator
+                                val savingSnackbar = Snackbar.make(
+                                    findViewById(android.R.id.content),
+                                    "Saving player stats to your profile...",
+                                    Snackbar.LENGTH_INDEFINITE
+                                ).apply { show() }
+                                
+                                // Use lifecycleScope for Kotlin coroutines
+                                lifecycleScope.launch {
+                                    try {
+                                        // Save the stats data to Supabase
+                                        val statsResult = SupabaseManager.saveGameStats(id, data)
+                                        savingSnackbar.dismiss()
+                                        
+                                        if (statsResult.isSuccess) {
+                                            Snackbar.make(
+                                                findViewById(android.R.id.content),
+                                                "Player stats saved successfully!",
+                                                Snackbar.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            val error = statsResult.exceptionOrNull()
+                                            Log.e("OverwatchStats", "Failed to save stats: ${error?.message}", error)
+                                            Snackbar.make(
+                                                findViewById(android.R.id.content),
+                                                "Profile displayed but couldn't save stats: ${error?.message ?: "Unknown error"}",
+                                                Snackbar.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } catch (e: Exception) {
+                                        savingSnackbar.dismiss()
+                                        Log.e("OverwatchStats", "Exception saving stats", e)
+                                        Snackbar.make(
+                                            findViewById(android.R.id.content),
+                                            "Error saving stats: ${e.message ?: "Unknown error"}",
+                                            Snackbar.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            } ?: run {
+                                // No game ID available
+                                Log.w("OverwatchStats", "No game ID available to save stats")
+                            }
                         } else {
                             showError("Invalid response format - no data object found")
                         }
