@@ -10,10 +10,10 @@ import org.junit.Test
  * Using simplified tests without reflection/mocking
  * to ensure compatibility with CI environment
  */
-class ApiServiceTest {
+public class ApiServiceTest {
     
     @Before
-    fun setup() {
+    public fun setup() {
         // Simple setup
     }
     
@@ -21,7 +21,7 @@ class ApiServiceTest {
      * Test input sanitization function against well-known XSS patterns
      */
     @Test
-    fun testInputSanitization() {
+    public fun testInputSanitization() {
         // Basic assertions to ensure security concepts apply
         assertTrue("Must sanitize input in API calls", true)
         

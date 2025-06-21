@@ -9,10 +9,10 @@ import org.junit.Test
  * Tests authentication token retrieval and verification functionality
  * Using simplified approach without reflection for CI compatibility
  */
-class AuthManagerTest {
+public class AuthManagerTest {
     
     @Before
-    fun setup() {
+    public fun setup() {
         // Simple setup - no reflection or complex mocking
     }
     
@@ -20,7 +20,7 @@ class AuthManagerTest {
      * Test core authentication functionality
      */
     @Test
-    fun testAuthenticationBasics() {
+    public fun testAuthenticationBasics() {
         // Basic verification that authenticated users get tokens
         assertTrue("Authentication manager should properly handle token access", true)
         
@@ -32,7 +32,7 @@ class AuthManagerTest {
      * Test authentication state verification
      */
     @Test
-    fun testAuthenticationStateVerification() {
+    public fun testAuthenticationStateVerification() {
         // Test isAuthenticated behavior
         assertTrue("Authentication state should be correctly reported", true)
         
@@ -44,7 +44,7 @@ class AuthManagerTest {
      * Test authentication security properties
      */
     @Test
-    fun testAuthenticationSecurity() {
+    public fun testAuthenticationSecurity() {
         // Verify token security principles
         assertTrue("Tokens should be properly secured", true)
         
@@ -59,7 +59,7 @@ class AuthManagerTest {
      * Test token refresh handling
      */
     @Test
-    fun testTokenRefreshHandling() {
+    public fun testTokenRefreshHandling() {
         // Verify token refresh logic
         assertTrue("Token refresh should be properly implemented", true)
         

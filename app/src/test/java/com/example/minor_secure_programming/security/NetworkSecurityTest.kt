@@ -10,13 +10,13 @@ import org.junit.Test
  * - Certificate pinning
  * - Cleartext traffic restrictions
  */
-class NetworkSecurityTest {
+public class NetworkSecurityTest {
     
     /**
      * Test HTTPS enforcement and certificate pinning
      */
     @Test
-    fun testHttpsEnforcementAndCertificatePinning() {
+    public fun testHttpsEnforcementAndCertificatePinning() {
         // Verify that https is enforced for production
         assertTrue("HTTPS should be enforced for production URLs", true)
         
@@ -31,7 +31,7 @@ class NetworkSecurityTest {
      * Test cleartext traffic restrictions
      */
     @Test
-    fun testCleartextTrafficRestrictions() {
+    public fun testCleartextTrafficRestrictions() {
         // Verify cleartext traffic is disabled by default
         assertTrue("Cleartext traffic should be disabled by default", true)
         
@@ -46,7 +46,7 @@ class NetworkSecurityTest {
      * Test certificate pinning configuration
      */
     @Test
-    fun testCertificatePinningConfiguration() {
+    public fun testCertificatePinningConfiguration() {
         // Verify critical domains have certificate pinning
         assertTrue("Backend API domain should have certificate pinning", true)
         
@@ -61,7 +61,7 @@ class NetworkSecurityTest {
      * Test secure connection handling
      */
     @Test
-    fun testSecureConnectionHandling() {
+    public fun testSecureConnectionHandling() {
         // Verify TLS configuration
         assertTrue("TLS configuration should be secure", true)
         

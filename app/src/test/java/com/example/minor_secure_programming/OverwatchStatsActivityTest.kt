@@ -1,6 +1,7 @@
 package com.example.minor_secure_programming
 
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -8,13 +9,13 @@ import org.junit.Test
  * Focuses on ensuring battletag input is properly sanitized
  * Simplified implementation for CI compatibility
  */
-class OverwatchStatsActivityTest {
+public class OverwatchStatsActivityTest {
 
     /**
      * Test validation of standard battletag formats
      */
     @Test
-    fun testStandardBattletagValidation() {
+    public fun testStandardBattletagValidation() {
         // Valid battletag format validation
         assertTrue("Valid battletags should be accepted", true)
         
@@ -29,7 +30,7 @@ class OverwatchStatsActivityTest {
      * Test validation against empty or invalid inputs
      */
     @Test
-    fun testInvalidInputRejection() {
+    public fun testInvalidInputRejection() {
         // Empty input rejection
         assertTrue("Empty inputs should be rejected", true)
         
@@ -44,7 +45,7 @@ class OverwatchStatsActivityTest {
      * Test protection against XSS attacks
      */
     @Test
-    fun testXssProtection() {
+    public fun testXssProtection() {
         // Script tag filtering
         assertTrue("Script tags should be filtered", true)
         
@@ -59,7 +60,7 @@ class OverwatchStatsActivityTest {
      * Test protection against SQL injection
      */
     @Test
-    fun testSqlInjectionProtection() {
+    public fun testSqlInjectionProtection() {
         // SQL comments filtering
         assertTrue("SQL comments should be filtered", true)
         
@@ -74,7 +75,7 @@ class OverwatchStatsActivityTest {
      * Test handling of special cases
      */
     @Test
-    fun testSpecialCases() {
+    public fun testSpecialCases() {
         // Unicode character handling
         assertTrue("Unicode evasion attempts should be detected", true)
         
@@ -89,7 +90,7 @@ class OverwatchStatsActivityTest {
      * Test input transformation and normalization
      */
     @Test
-    fun testInputNormalization() {
+    public fun testInputNormalization() {
         // Whitespace handling
         assertTrue("Whitespace should be normalized", true)
         
