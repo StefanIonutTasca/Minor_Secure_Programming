@@ -173,7 +173,7 @@ class CVActivity : AppCompatActivity() {
             loadGameStatsFromSupabase()
             
         } catch (e: Exception) {
-            Log.e("CVActivity", "Error loading user games", e)
+            // Security: Error handling - logging removed
             Snackbar.make(findViewById(android.R.id.content), 
                 "Error loading game stats: ${e.message}", 
                 Snackbar.LENGTH_SHORT).show()
@@ -194,7 +194,7 @@ class CVActivity : AppCompatActivity() {
                             processOverwatchStats(statsData)
                         }
                     } else {
-                        Log.e("CVActivity", "Failed to load Overwatch stats: ${result.exceptionOrNull()?.message}")
+                        // Security: Error handling - logging removed
                     }
                 }
                 
@@ -214,7 +214,7 @@ class CVActivity : AppCompatActivity() {
                 // Process any additional game stats as they become available
                 
             } catch (e: Exception) {
-                Log.e("CVActivity", "Error loading stats from Supabase", e)
+                // Security: Error handling - logging removed
             }
         }
     }
@@ -298,7 +298,7 @@ class CVActivity : AppCompatActivity() {
                                 val summary = profile.optJSONObject("summary")
                                 val username = summary?.optString("username", "Unknown")
                                 
-                                Log.d("CVActivity", "Processing Overwatch stats for $username: $totalHours hours, $finalWinRate% win rate, $gamesWon games won")
+                                // Security: Logging removed
                                  
                                 // Update category stats with Overwatch data
                                 updateCategoryStats("Overwatch", totalHours, finalWinRate, gamesWon)
@@ -308,7 +308,7 @@ class CVActivity : AppCompatActivity() {
                 }
             }
         } catch (e: Exception) {
-            Log.e("CVActivity", "Error processing Overwatch stats", e)
+            // Security: Error handling - logging removed
         }
     }
     
@@ -414,7 +414,7 @@ class CVActivity : AppCompatActivity() {
                 tvMastery.text = masteryLevels[masteryIndex]
                 
                 // Log the update for debugging
-                Log.d("CVActivity", "Updated $category stats - Hours: $hours, Win Rate: $winRate%, Games: $gamesCount")
+                // Security: Logging removed
             }
         }
     }

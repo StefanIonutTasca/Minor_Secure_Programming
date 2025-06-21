@@ -61,7 +61,7 @@ object SupabaseManager : CoroutineScope {
     ) {
         launch {
             try {
-                Log.d("SupabaseClient", "Attempting to sign in user with email: $email")
+                // Security: Logging removed
                 
                 // Using the Supabase 3.0.0 API
                 client.auth.signInWith(Email) {
@@ -69,13 +69,13 @@ object SupabaseManager : CoroutineScope {
                     this.password = password
                 }
                 
-                Log.d("SupabaseClient", "Sign in successful")
+                // Security: Logging removed
                 
                 withContext(Dispatchers.Main) {
                     onSuccess()
                 }
             } catch (e: Exception) {
-                Log.e("SupabaseClient", "Sign in error: ${e.message}", e)
+                // Security: Error handling - logging removed
                 withContext(Dispatchers.Main) {
                     onError(e)
                 }
@@ -98,20 +98,20 @@ object SupabaseManager : CoroutineScope {
     ) {
         launch {
             try {
-                Log.d("SupabaseClient", "Attempting to sign up user with email: $email")
+                // Security: Logging removed
                 
                 client.auth.signUpWith(Email) {
                     this.email = email
                     this.password = password
                 }
                 
-                Log.d("SupabaseClient", "Sign up successful")
+                // Security: Logging removed
                 
                 withContext(Dispatchers.Main) {
                     onSuccess()
                 }
             } catch (e: Exception) {
-                Log.e("SupabaseClient", "Sign up error: ${e.message}", e)
+                // Security: Error handling - logging removed
                 withContext(Dispatchers.Main) {
                     onError(e)
                 }
@@ -135,7 +135,7 @@ object SupabaseManager : CoroutineScope {
                     onSuccess()
                 }
             } catch (e: Exception) {
-                Log.e("SupabaseClient", "Sign out error: ${e.message}", e)
+                // Security: Error handling - logging removed
                 withContext(Dispatchers.Main) {
                     onError(e)
                 }
@@ -152,7 +152,7 @@ object SupabaseManager : CoroutineScope {
             val session = client.auth.currentSessionOrNull()
             session != null
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error checking login status: ${e.message}", e)
+            // Security: Error handling - logging removed
             false
         }
     }
@@ -164,7 +164,7 @@ object SupabaseManager : CoroutineScope {
         return try {
             client.auth.currentUserOrNull()
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error getting current user: ${e.message}", e)
+            // Security: Error handling - logging removed
             null
         }
     }
@@ -179,7 +179,7 @@ object SupabaseManager : CoroutineScope {
         return try {
             val user = client.auth.currentUserOrNull()
             if (user == null) {
-                Log.d("SupabaseClient", "No logged in user found")
+                // Security: Logging removed
                 return null
             }
             
@@ -197,7 +197,7 @@ object SupabaseManager : CoroutineScope {
                 "email" to email
             )
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error getting user profile: ${e.message}", e)
+            // Security: Error handling - logging removed
             null
         }
     }
@@ -214,14 +214,14 @@ object SupabaseManager : CoroutineScope {
             
             // Execute the query through an RPC function that runs SQL
             // Note: you may need to create this function in Supabase SQL Editor first
-            Log.d("SupabaseClient", "SQL query: $sql")
+            // Security: SQL query logging removed
             
             // For now, we'll just log the update and assume success
             // since we're having issues with the API
-            Log.d("SupabaseClient", "Username updated successfully to: $username")
+            // Security: Logging removed
             true
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error updating username: ${e.message}", e)
+            // Security: Error handling - logging removed
             false
         }
     }
@@ -234,10 +234,10 @@ object SupabaseManager : CoroutineScope {
             val response = client.postgrest.from("game_categories")
                 .select()
                 .decodeList<GameCategory>()
-            Log.d("SupabaseClient", "Got ${response.size} game categories")
+            // Security: Logging removed
             response
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error getting game categories: ${e.message}", e)
+            // Security: Error handling - logging removed
             emptyList()
         }
     }
@@ -278,7 +278,7 @@ object SupabaseManager : CoroutineScope {
                 game.copy(category_name = categoryName)
             }
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error getting user games: ${e.message}", e)
+            // Security: Error handling - logging removed
             return emptyList()
         }
     }
@@ -302,10 +302,10 @@ object SupabaseManager : CoroutineScope {
             )
             
             client.postgrest.from("games").insert(newGame)
-            Log.d("SupabaseClient", "Added game: $gameName")
+            // Security: Logging removed
             return true
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error adding game: ${e.message}", e)
+            // Security: Error handling - logging removed
             return false
         }
     }
@@ -326,10 +326,10 @@ object SupabaseManager : CoroutineScope {
                     }
                 }
             
-            Log.d("SupabaseClient", "Game deleted successfully: $gameId")
+            // Security: Logging removed
             true
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error deleting game: ${e.message}", e)
+            // Security: Error handling - logging removed
             false
         }
     }
@@ -366,7 +366,7 @@ object SupabaseManager : CoroutineScope {
                         put("last_refreshed", JsonPrimitive(now))
                     }))
                 
-                Log.d("SupabaseClient", "Inserted new game stats")
+                // Security: Logging removed
                 Result.success(true)
             } else {
                 // Update existing stats
@@ -384,11 +384,11 @@ object SupabaseManager : CoroutineScope {
                         }
                     }
                 
-                Log.d("SupabaseClient", "Updated existing game stats")
+                // Security: Logging removed
                 Result.success(true)
             }
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error saving game stats: ${e.message}", e)
+            // Security: Error handling - logging removed
             Result.failure(e)
         }
     }
@@ -398,7 +398,7 @@ object SupabaseManager : CoroutineScope {
      * @param context Android context
      */
     fun initialize(context: Context) {
-        Log.d("SupabaseClient", "Initialized Supabase client")
+        // Security: Logging removed
     }
     
     /**
@@ -408,10 +408,10 @@ object SupabaseManager : CoroutineScope {
     suspend fun signOut(): Result<Unit> {
         return try {
             client.auth.signOut()
-            Log.d("SupabaseClient", "User signed out successfully")
+            // Security: Logging removed
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error signing out: ${e.message}", e)
+            // Security: Error handling - logging removed
             Result.failure(e)
         }
     }
@@ -451,8 +451,43 @@ object SupabaseManager : CoroutineScope {
             }
             
         } catch (e: Exception) {
-            Log.e("SupabaseClient", "Error retrieving game stats: ${e.message}", e)
+            // Security: Error handling - logging removed
             Result.failure(e)
         }
+    }
+    
+    /**
+     * Debug function to get detailed information about authentication status
+     * Temporary function to help debug authentication issues
+     * @return Map with details about current auth state
+     */
+    suspend fun debugAuthStatus(): Map<String, Any?> {
+        val currentSession = client.auth.currentSessionOrNull()
+        val currentUser = client.auth.currentUserOrNull()
+        
+        val tokenPreview = if (currentSession?.accessToken != null && currentSession.accessToken.length > 20) {
+            "${currentSession.accessToken.substring(0, 20)}..."
+        } else {
+            "Token missing or invalid"
+        }
+        
+        val refreshTokenPreview = if (currentSession?.refreshToken != null && currentSession.refreshToken.length > 10) {
+            "${currentSession.refreshToken.substring(0, 10)}..."
+        } else {
+            "Refresh token missing"
+        }
+        
+        return mapOf(
+            "isLoggedIn" to isLoggedIn(),
+            "hasSession" to (currentSession != null),
+            "accessTokenExists" to (currentSession?.accessToken != null),
+            "accessTokenPreview" to tokenPreview,
+            "accessTokenLength" to (currentSession?.accessToken?.length ?: 0),
+            "refreshTokenExists" to (currentSession?.refreshToken != null),
+            "refreshTokenPreview" to refreshTokenPreview,
+            "userExists" to (currentUser != null),
+            "userId" to (currentUser?.id),
+            "userEmail" to (currentUser?.email)
+        )
     }
 }

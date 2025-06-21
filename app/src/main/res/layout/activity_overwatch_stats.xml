@@ -224,48 +224,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Player Search -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Search Player"
-                        android:textSize="20sp"
-                        android:textStyle="bold"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:hint="Enter Battletag (e.g., Felix-11257)">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_overwatch_battletag"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="text"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <Button
-                        android:id="@+id/btn_search_overwatch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Search"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            <!-- Player Search section removed to avoid duplication -->
 
             <!-- Friends for Comparison -->
             <androidx.cardview.widget.CardView
@@ -358,8 +317,33 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Compare with Pro Player"
+                        android:text="Player Comparison"
                         android:textSize="20sp"
+                        android:textStyle="bold"/>
+                    
+                    <!-- Last compared player section -->
+                    <LinearLayout
+                        android:id="@+id/layout_last_compared"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp">
+                        
+                        <Button
+                            android:id="@+id/btn_compare_last"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Compare with last player"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+                    
+                    <!-- Pro player section -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Compare with Pro Player"
+                        android:textSize="16sp"
                         android:textStyle="bold"/>
 
                     <Spinner
@@ -373,7 +357,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Compare Stats"
+                        android:text="Compare with Pro"
                         android:enabled="false"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
