@@ -129,7 +129,7 @@ class GamesActivity : AppCompatActivity() {
                 gameCategories = categories
                 runOnUiThread { callback(categories) }
             } catch (e: Exception) {
-                Log.e("GamesActivity", "Error fetching game categories: ${e.message}", e)
+                // Security: Error handling - logging removed
                 runOnUiThread { 
                     Toast.makeText(this@GamesActivity, "Error loading game categories", Toast.LENGTH_SHORT).show()
                     callback(emptyList())
@@ -210,7 +210,7 @@ class GamesActivity : AppCompatActivity() {
                     // Show error message
                     val errorMessage = "Error loading games: ${e.message}"
                     Toast.makeText(this@GamesActivity, errorMessage, Toast.LENGTH_LONG).show()
-                    Log.e("GamesActivity", errorMessage, e)
+                    // Security: Error handling - logging removed
                     
                     // Clear the container except for the first 3 items
                     val childCount = gamesContainer.childCount

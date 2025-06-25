@@ -116,7 +116,7 @@ class DotaStatsActivity : AppCompatActivity() {
                     return gameData.optString("steamId")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error parsing game data JSON", e)
+                // Security: Error handling - logging removed
             }
         }
         
@@ -219,7 +219,7 @@ class DotaStatsActivity : AppCompatActivity() {
                                 fetchAndSaveRecentMatches(playerIdOrName, id)
                             } else {
                                 val error = statsResult.exceptionOrNull()
-                                Log.e(TAG, "Failed to save stats: ${error?.message}", error)
+                                // Security: Error handling - logging removed
                                 Snackbar.make(
                                     findViewById(android.R.id.content),
                                     "Profile displayed but couldn't save stats",
@@ -228,7 +228,7 @@ class DotaStatsActivity : AppCompatActivity() {
                             }
                         } ?: run {
                             // No game ID available
-                            Log.w(TAG, "No game ID available to save stats")
+                            // Security: Warning removed
                         }
                     } else {
                         showError("Failed to parse player data")
@@ -236,12 +236,12 @@ class DotaStatsActivity : AppCompatActivity() {
                 } else {
                     val error = result.exceptionOrNull()
                     showError("Error: ${error?.message ?: "Unknown error"}")
-                    Log.e(TAG, "API error", error)
+                    // Security: Error handling - logging removed
                 }
                 loadingSnackbar.dismiss()
             } catch (e: Exception) {
                 showError("Error: ${e.message ?: "Unknown error"}")
-                Log.e(TAG, "Exception in fetchAndDisplayPlayerProfile", e)
+                // Security: Error handling - logging removed
             }
         }
     }
@@ -269,18 +269,18 @@ class DotaStatsActivity : AppCompatActivity() {
                         val saveResult = SupabaseManager.saveGameStats(gameId, combinedStats)
                         
                         if (saveResult.isSuccess) {
-                            Log.d(TAG, "Successfully saved recent matches data")
+                            // Security: Logging removed
                         } else {
                             val error = saveResult.exceptionOrNull()
-                            Log.e(TAG, "Failed to save recent matches: ${error?.message}", error)
+                            // Security: Error handling - logging removed
                         }
                     }
                 } else {
                     val error = result.exceptionOrNull()
-                    Log.e(TAG, "Error fetching recent matches: ${error?.message}", error)
+                    // Security: Error handling - logging removed
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Exception in fetchAndSaveRecentMatches", e)
+                // Security: Error handling - logging removed
             }
         }
     }
@@ -369,7 +369,7 @@ class DotaStatsActivity : AppCompatActivity() {
             this.lastLoadedProfile = profileData
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error updating UI with player data", e)
+            // Security: Error handling - logging removed
             Toast.makeText(this, "Error parsing player data: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
@@ -394,7 +394,7 @@ class DotaStatsActivity : AppCompatActivity() {
             when (friendCompareButtons.size) {
                 0 -> {
                     // No buttons found - log the issue
-                    Log.d(TAG, "No compare buttons found in layout")
+                    // Security: Logging removed
                 }
                 1 -> {
                     // Only found one button
@@ -431,7 +431,7 @@ class DotaStatsActivity : AppCompatActivity() {
             }
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error setting up friend compare buttons: ${e.message}")
+            // Security: Error handling - logging removed
         }
     }
     
@@ -518,7 +518,7 @@ class DotaStatsActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 loadingDialog.dismiss()
                 showError("Error comparing with $otherPlayerName: ${e.message}")
-                Log.e(TAG, "Error in comparison", e)
+                // Security: Error handling - logging removed
             }
         }
     }
@@ -533,8 +533,8 @@ class DotaStatsActivity : AppCompatActivity() {
     ) {
         try {
             // Log the raw JSON data for debugging
-            Log.d(TAG, "Current player data: $currentPlayerData")
-            Log.d(TAG, "Other player data: $otherPlayerData")
+            // Security: Logging removed
+            // Security: Logging removed
             
             // Set player names - handle both API response formats
             // API might return either direct data or nested under 'data'
@@ -593,7 +593,7 @@ class DotaStatsActivity : AppCompatActivity() {
             dialogView.findViewById<TextView>(R.id.tvPlayer2Heroes).text = otherHeroes
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error populating comparison dialog", e)
+            // Security: Error handling - logging removed
         }
     }
     
@@ -671,7 +671,7 @@ class DotaStatsActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 loadingDialog.dismiss()
                 Toast.makeText(this@DotaStatsActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                Log.e(TAG, "Error searching for player", e)
+                // Security: Error handling - logging removed
             }
         }
     }
@@ -728,15 +728,15 @@ class DotaStatsActivity : AppCompatActivity() {
                     // Update UI
                     updateLastComparedInUI(name)
                     
-                    Log.d(TAG, "Loaded last compared player: $name")
+                    // Security: Logging removed
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing saved player data", e)
+                    // Security: Error handling - logging removed
                 }
             } else {
-                Log.d(TAG, "No saved player data found")
+                // Security: Logging removed
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error loading saved player data", e)
+            // Security: Error handling - logging removed
         }
     }
     
