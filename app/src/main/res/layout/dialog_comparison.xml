@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Player Names Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="16dp">
+
+        <!-- Empty space for alignment (20%) -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2" />
+
+        <!-- Your Name (40%) -->
+        <TextView
+            android:id="@+id/tvPlayerOne"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Your Profile"
+            android:textAlignment="center"
+            android:textStyle="bold" />
+
+        <!-- Other Player Name (40%) -->
+        <TextView
+            android:id="@+id/tvPlayerTwo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Other Player"
+            android:textAlignment="center"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- Win/Loss Stats Section -->
+            <TextView
+                android:id="@+id/tvWinLossHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Win/Loss Statistics"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp" />
+                
+            <!-- Container for Win/Loss Comparison -->
+            <LinearLayout
+                android:id="@+id/layoutWinLossComparison"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="8dp" />
+            
+            <!-- Playtime Section -->
+            <TextView
+                android:id="@+id/tvPlaytimeHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Playtime Statistics"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp" />
+                
+            <LinearLayout
+                android:id="@+id/layoutPlaytimeComparison"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="8dp" />
+                
+            <!-- General Stats Section -->
+            <TextView
+                android:id="@+id/tvGeneralHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="General Statistics"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp" />
+                
+            <LinearLayout
+                android:id="@+id/layoutGeneralComparison"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="8dp" />
+
+        </LinearLayout>
+        
+    </ScrollView>
+
+</LinearLayout>

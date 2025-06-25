@@ -2,36 +2,37 @@ package com.example.minor_secure_programming
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
+import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
+import com.example.minor_secure_programming.models.Game
+import com.example.minor_secure_programming.models.GameCategory
+import com.example.minor_secure_programming.utils.SupabaseManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.coroutines.launch
 
 class GamesActivity : AppCompatActivity() {
-    // List of available games with categories
-    private val gameCategories = mapOf(
-        "FPS" to listOf("Rainbow Six Siege", "Valorant", "CS:GO", "Apex Legends"),
-        "MOBA" to listOf("League of Legends", "Dota 2"),
-        "MMO" to listOf("World of Warcraft", "Old School RuneScape"),
-        "Battle Royale" to listOf("Fortnite", "Apex Legends"),
-        "Sandbox" to listOf("Minecraft")
-    )
-    
-    // Flattened list of all games for the spinner
-    private val availableGames = gameCategories.values.flatten().distinct().sorted().toTypedArray()
-    
     // Container for user-added games
     private lateinit var gamesContainer: LinearLayout
+    
+    // Progress indicator
+    private lateinit var progressBar: ProgressBar
+    
+    // Lists for game data
+    private var gameCategories = listOf<GameCategory>()
+    private var userGames = listOf<Game>()
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_games)
@@ -40,18 +41,23 @@ class GamesActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "My Games"
         
-        // Get the LinearLayout container for games
+        // Get the LinearLayout container for games and progress bar
         gamesContainer = findViewById<LinearLayout>(R.id.gamesContainer)
+        progressBar = findViewById(R.id.progressBarGames)
         
         // Setup Add Game button
         findViewById<MaterialButton>(R.id.btnAddGame).setOnClickListener {
-            showAddGameDialog()
+            fetchGameCategories { categories ->
+                if (categories.isNotEmpty()) {
+                    showAddGameDialog(categories)
+                } else {
+                    Toast.makeText(this, "Cannot add games at this time. Please try again later.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         
-        // Load any previously saved games
-        loadSavedGames()
-        
-        // Click listeners are now set when creating game cards dynamically in loadSavedGames()
+        // Load games from Supabase
+        loadUserGames()
         
         // Initialize the bottom navigation
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
@@ -75,8 +81,6 @@ class GamesActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        
-        // Don't set the active item here since it's a detail page
     }
     
     override fun onSupportNavigateUp(): Boolean {
@@ -85,50 +89,225 @@ class GamesActivity : AppCompatActivity() {
     }
     
     /**
-     * Shows dialog for adding a new game
+     * Add a new game to Supabase
      */
-    private fun showAddGameDialog() {
+    private fun addGameToSupabase(categoryId: String, gameName: String, username: String) {
+        // Show progress
+        progressBar.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            try {
+                val success = SupabaseManager.addGame(categoryId, gameName, username)
+                
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    
+                    if (success) {
+                        Toast.makeText(this@GamesActivity, "Game added successfully!", Toast.LENGTH_SHORT).show()
+                        // Refresh the games list
+                        loadUserGames()
+                    } else {
+                        Toast.makeText(this@GamesActivity, "Failed to add game", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    Toast.makeText(this@GamesActivity, "Error adding game: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Fetch game categories from Supabase
+     */
+    private fun fetchGameCategories(callback: (List<GameCategory>) -> Unit) {
+        lifecycleScope.launch {
+            try {
+                val categories = SupabaseManager.getGameCategories()
+                gameCategories = categories
+                runOnUiThread { callback(categories) }
+            } catch (e: Exception) {
+                // Security: Error handling - logging removed
+                runOnUiThread { 
+                    Toast.makeText(this@GamesActivity, "Error loading game categories", Toast.LENGTH_SHORT).show()
+                    callback(emptyList())
+                }
+            }
+        }
+    }
+    
+    /**
+     * Load user games from Supabase
+     */
+    private fun loadUserGames() {
+        // Show loading indicator
+        progressBar.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            try {
+                val games = SupabaseManager.getUserGames()
+                userGames = games
+                
+                runOnUiThread {
+                    // Hide loading indicator
+                    progressBar.visibility = View.GONE
+                    
+                    // Since we're directly accessing the layout components without recreating them,
+                    // we should clear the container except for the first 3 items (title, progress bar, add button)
+                    val childCount = gamesContainer.childCount
+                    if (childCount > 3) {
+                        gamesContainer.removeViews(3, childCount - 3)
+                    }
+                    
+                    // Group games by category
+                    val gamesByCategory = games.groupBy { it.category_name }
+                    
+                    if (games.isEmpty()) {
+                        val noGamesText = TextView(this@GamesActivity).apply {
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            ).apply { setMargins(0, dpToPx(16), 0, 0) }
+                            text = "You haven't added any games yet."
+                            textSize = 16f
+                            gravity = android.view.Gravity.CENTER
+                        }
+                        gamesContainer.addView(noGamesText)
+                    } else {
+                        // Sort categories alphabetically
+                        val sortedCategories = gamesByCategory.keys.sorted()
+                        
+                        // For each category, add a header and then all games in that category
+                        sortedCategories.forEach { category ->
+                            val gamesInCategory = gamesByCategory[category] ?: return@forEach
+                            if (gamesInCategory.isNotEmpty()) {
+                                addCategoryHeader(category)
+                                
+                                // Sort games within each category by name
+                                val sortedGames = gamesInCategory.sortedBy { it.name }
+                                sortedGames.forEach { game ->
+                                    addGameToList(game)
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Show a toast with the count of games loaded
+                    if (games.isNotEmpty()) {
+                        Toast.makeText(
+                            this@GamesActivity, 
+                            "Loaded ${games.size} game${if (games.size == 1) "" else "s"}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    
+                    // Show error message
+                    val errorMessage = "Error loading games: ${e.message}"
+                    Toast.makeText(this@GamesActivity, errorMessage, Toast.LENGTH_LONG).show()
+                    // Security: Error handling - logging removed
+                    
+                    // Clear the container except for the first 3 items
+                    val childCount = gamesContainer.childCount
+                    if (childCount > 3) {
+                        gamesContainer.removeViews(3, childCount - 3)
+                    }
+                    
+                    // Add error message text
+                    val noGamesText = TextView(this@GamesActivity).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply { setMargins(0, dpToPx(16), 0, 0) }
+                        text = "Error loading games. Please try again later."
+                        textSize = 16f
+                        gravity = android.view.Gravity.CENTER
+                    }
+                    gamesContainer.addView(noGamesText)
+                }
+            }
+        }
+    }
+    
+    /**
+     * Map of predefined games by category
+     */
+    private val predefinedGames = mapOf(
+        "FPS" to listOf("Overwatch", "Call of Duty", "Valorant", "Counter-Strike"),
+        "MOBA" to listOf("League of Legends", "Dota 2", "Heroes of the Storm", "Smite"),
+        "Strategy" to listOf("StarCraft II", "Age of Empires", "Civilization VI", "Warcraft III")
+    )
+    
+    /**
+     * Show dialog to add a new game
+     */
+    private fun showAddGameDialog(categories: List<GameCategory>) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_game, null)
+        val usernameField = dialogView.findViewById<EditText>(R.id.editTextUsername)
         
-        // Set up category spinner
-        val categorySpinner = dialogView.findViewById<Spinner>(R.id.spinnerCategories)
-        val categories = gameCategories.keys.toList()
-        val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, categories)
-        categorySpinner.adapter = categoryAdapter
+        // Game categories spinner
+        val categoriesSpinner = dialogView.findViewById<Spinner>(R.id.spinnerGameCategory)
+        val categoryNames = categories.map { it.name }.toTypedArray()
+        val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, categoryNames)
+        categoriesSpinner.adapter = categoryAdapter
         
-        // Set up game spinner
-        val gameSpinner = dialogView.findViewById<Spinner>(R.id.spinnerGames)
-        var gameAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, 
-                      gameCategories[categories[0]]?.toTypedArray() ?: emptyArray())
-        gameSpinner.adapter = gameAdapter
+        // Game names spinner
+        val gamesSpinner = dialogView.findViewById<Spinner>(R.id.spinnerGameName)
+        // Using ArrayList instead of array to support modifications
+        val gamesList = ArrayList<String>()
+        val gamesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, gamesList)
+        gamesSpinner.adapter = gamesAdapter
         
-        // Update games when category changes
-        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedCategory = categories[position]
-                val gamesInCategory = gameCategories[selectedCategory]?.toTypedArray() ?: emptyArray()
-                gameAdapter = ArrayAdapter(this@GamesActivity, 
-                           android.R.layout.simple_spinner_dropdown_item, gamesInCategory)
-                gameSpinner.adapter = gameAdapter
+        // Update game list when category changes
+        categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedCategory = categoryNames[position]
+                val games = predefinedGames[selectedCategory] ?: emptyList()
+                
+                // Replace the contents of the adapter properly
+                gamesAdapter.clear()
+                for (game in games) {
+                    gamesAdapter.add(game)
+                }
+                gamesAdapter.notifyDataSetChanged()
             }
             
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                gamesAdapter.clear()
+                gamesAdapter.notifyDataSetChanged()
+            }
         }
         
-        // Create dialog
         val dialog = AlertDialog.Builder(this)
+            .setTitle("Add a New Game")
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
-                // Get user inputs
-                val selectedGame = gameSpinner.selectedItem?.toString() ?: ""
-                val username = dialogView.findViewById<EditText>(R.id.editTextUsername).text.toString()
-                
-                // Validate inputs
-                if (username.isNotEmpty() && selectedGame.isNotEmpty()) {
-                    addGameToList(selectedGame, username)
-                    saveGame(selectedGame, username)
+                val selectedCategoryIndex = categoriesSpinner.selectedItemPosition
+                val categoryId = if (selectedCategoryIndex >= 0 && selectedCategoryIndex < categories.size) {
+                    categories[selectedCategoryIndex].id
                 } else {
-                    Toast.makeText(this, "Please enter a username and select a game", Toast.LENGTH_SHORT).show()
+                    "" // default empty category ID as fallback
+                }
+                
+                val selectedCategory = if (selectedCategoryIndex >= 0) categoryNames[selectedCategoryIndex] else ""
+                val selectedGameIndex = gamesSpinner.selectedItemPosition
+                val gameName = if (selectedGameIndex >= 0 && predefinedGames[selectedCategory] != null) {
+                    predefinedGames[selectedCategory]!![selectedGameIndex]
+                } else {
+                    ""
+                }
+                
+                val username = usernameField.text.toString().trim()
+                
+                if (username.isNotEmpty() && gameName.isNotEmpty() && categoryId.isNotEmpty()) {
+                    addGameToSupabase(categoryId, gameName, username)
+                } else {
+                    Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -138,243 +317,120 @@ class GamesActivity : AppCompatActivity() {
     }
     
     /**
-     * Adds a game card to the UI
-     */
-    private fun addGameToList(gameName: String, username: String) {
-        val cardView = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                dpToPx(120)
-            ).apply {
-                bottomMargin = dpToPx(16)
-            }
-            radius = dpToPx(8).toFloat()
-            cardElevation = dpToPx(4).toFloat()
-        }
-        
-        // Create constraint layout for the card content
-        val constraintLayout = ConstraintLayout(this).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        }
-        
-        // Add game logo
-        val imageView = ImageView(this).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                dpToPx(60),
-                dpToPx(60)
-            ).apply {
-                startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                marginStart = dpToPx(16)
-            }
-            
-            // Set appropriate game logo based on game name
-            when (gameName) {
-                "League of Legends" -> setImageResource(R.drawable.league)
-                "Rainbow Six Siege" -> setImageResource(R.drawable.r6s)
-                "Valorant" -> setImageResource(R.drawable.valorant)
-                "Dota 2" -> setImageResource(R.drawable.dota2)
-                "CS:GO", "Counter-Strike: Global Offensive" -> setImageResource(R.drawable.cs_go)
-                else -> setImageResource(android.R.drawable.ic_menu_slideshow) // Generic icon for other games
-            }
-            scaleType = ImageView.ScaleType.FIT_CENTER
-        }
-        constraintLayout.addView(imageView)
-        
-        // Add title
-        val titleView = TextView(this).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                0,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                startToEnd = imageView.id
-                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                marginStart = dpToPx(16)
-                marginEnd = dpToPx(16)
-                topMargin = dpToPx(16)
-            }
-            text = gameName
-            textSize = 18f
-            setTypeface(null, Typeface.BOLD)
-        }
-        constraintLayout.addView(titleView)
-        
-        // Add username
-        val usernameView = TextView(this).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                0,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                startToEnd = imageView.id
-                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                topToBottom = titleView.id
-                marginStart = dpToPx(16)
-                marginEnd = dpToPx(16)
-                topMargin = dpToPx(8)
-            }
-            text = "Username: $username"
-        }
-        constraintLayout.addView(usernameView)
-        
-        // Add the view stats label
-        val statsView = TextView(this).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                marginEnd = dpToPx(16)
-                bottomMargin = dpToPx(8)
-            }
-            text = "Tap to view stats →"
-            setTextColor(resources.getColor(android.R.color.holo_blue_dark))
-        }
-        constraintLayout.addView(statsView)
-        
-        // Add the layout to the card
-        cardView.addView(constraintLayout)
-        
-        // Set click listener for specific games
-        cardView.setOnClickListener {
-            when (gameName) {
-                "Rainbow Six Siege" -> {
-                    val intent = Intent(this, R6StatsActivity::class.java)
-                    intent.putExtra("USERNAME", username)
-                    startActivity(intent)
-                }
-                "Valorant" -> {
-                    val intent = Intent(this, ValorantStatsActivity::class.java)
-                    intent.putExtra("USERNAME", username)
-                    startActivity(intent)
-                }
-                "League of Legends" -> {
-                    val intent = Intent(this, LolStatsActivity::class.java)
-                    intent.putExtra("USERNAME", username)
-                    startActivity(intent)
-                }
-                else -> {
-                    Toast.makeText(this, "$gameName stats coming soon!", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        
-        // Add to the container (below the built-in game cards)
-        gamesContainer.addView(cardView)
-    }
-    
-    /**
-     * Save game data to SharedPreferences
-     */
-    private fun saveGame(gameName: String, username: String) {
-        val sharedPrefs = getSharedPreferences("user_games", Context.MODE_PRIVATE)
-        val gamesJson = sharedPrefs.getString("games", "[]") ?: "[]"
-        
-        try {
-            val gamesArray = JSONArray(gamesJson)
-            
-            // Find the game's category
-            var gameCategory = ""
-            for ((category, games) in gameCategories) {
-                if (games.contains(gameName)) {
-                    gameCategory = category
-                    break
-                }
-            }
-            
-            val gameObject = JSONObject().apply {
-                put("name", gameName)
-                put("username", username)
-                put("category", gameCategory)
-            }
-            gamesArray.put(gameObject)
-            
-            // Save updated array
-            sharedPrefs.edit().putString("games", gamesArray.toString()).apply()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error saving game data", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
-    /**
-     * Load saved games from SharedPreferences
-     */
-    private fun loadSavedGames() {
-        val sharedPrefs = getSharedPreferences("user_games", Context.MODE_PRIVATE)
-        val gamesJson = sharedPrefs.getString("games", "[]") ?: "[]"
-        
-        try {
-            // Clear any existing games first (except the add button and title)
-            // Keep only the first two items (title and add button)
-            while (gamesContainer.childCount > 2) {
-                gamesContainer.removeViewAt(2)
-            }
-            
-            // Create a map to collect games by category
-            val gamesByCategory = mutableMapOf<String, MutableList<Pair<String, String>>>()
-            
-            val gamesArray = JSONArray(gamesJson)
-            for (i in 0 until gamesArray.length()) {
-                val game = gamesArray.getJSONObject(i)
-                val name = game.getString("name")
-                val username = game.getString("username")
-                val category = game.optString("category", "Other")
-                
-                // Add to category map
-                if (!gamesByCategory.containsKey(category)) {
-                    gamesByCategory[category] = mutableListOf()
-                }
-                gamesByCategory[category]?.add(Pair(name, username))
-            }
-            
-            // Now display games by category
-            gamesByCategory.keys.sorted().forEach { category ->
-                // Only add category if it has games
-                val games = gamesByCategory[category]
-                if (!games.isNullOrEmpty()) {
-                    // Add category header
-                    addCategoryHeader(category)
-                    
-                    // Add all games in this category
-                    games.forEach { (name, username) ->
-                        addGameToList(name, username)
-                    }
-                }
-            }
-            
-            // Show a message if no games are added
-            if (gamesArray.length() == 0) {
-                val noGamesText = TextView(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    text = "No games added yet. Click '+ Add New Game' to get started!"
-                    textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-                    setPadding(0, dpToPx(32), 0, 0)
-                }
-                gamesContainer.addView(noGamesText)
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error loading games: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
-    /**
      * Convert dp to pixels
      */
     private fun dpToPx(dp: Int): Int {
         val density = resources.displayMetrics.density
         return (dp * density).toInt()
+    }
+    
+    /**
+     * Adds a game item to the UI from a Supabase Game model
+     */
+    private fun addGameToList(game: Game) {
+        // Create card for the game
+        val gameCard = CardView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, dpToPx(8), 0, dpToPx(8))
+            }
+            radius = dpToPx(8).toFloat()
+            cardElevation = dpToPx(2).toFloat()
+            
+            // Make the card clickable for supported games
+            when (game.name) {
+                "Dota 2" -> {
+                    isClickable = true
+                    isFocusable = true
+                    foreground = getDrawable(android.R.drawable.list_selector_background)
+                    setOnClickListener {
+                        val intent = Intent(this@GamesActivity, DotaStatsActivity::class.java)
+                        // Pass any necessary game data
+                        intent.putExtra("GAME_ID", game.id)
+                        intent.putExtra("USERNAME", game.username)
+                        startActivity(intent)
+                    }
+                }
+                "Overwatch" -> {
+                    isClickable = true
+                    isFocusable = true
+                    foreground = getDrawable(android.R.drawable.list_selector_background)
+                    setOnClickListener {
+                        val intent = Intent(this@GamesActivity, OverwatchStatsActivity::class.java)
+                        // Pass any necessary game data
+                        intent.putExtra("GAME_ID", game.id)
+                        intent.putExtra("USERNAME", game.username)
+                        startActivity(intent)
+                    }
+                }
+            }
+        }
+        
+        // Card content layout
+        val cardContent = ConstraintLayout(this).apply {
+            id = View.generateViewId()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16))
+        }
+        
+        // Game name text
+        val gameName = TextView(this).apply {
+            id = View.generateViewId()
+            text = game.name
+            textSize = 18f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.BLACK)
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topToTop = cardContent.id
+                startToStart = cardContent.id
+            }
+        }
+        cardContent.addView(gameName)
+        
+        // Username text
+        val usernameText = TextView(this).apply {
+            id = View.generateViewId()
+            text = "Username: ${game.username}"
+            textSize = 14f
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topToBottom = gameName.id
+                startToStart = cardContent.id
+                topMargin = dpToPx(4)
+            }
+        }
+        cardContent.addView(usernameText)
+        
+        // Remove button
+        val removeButton = MaterialButton(this).apply {
+            id = View.generateViewId()
+            text = "Remove"
+            setBackgroundColor(resources.getColor(android.R.color.holo_red_light, theme))
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT, 
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topToTop = cardContent.id
+                endToEnd = cardContent.id
+            }
+            setOnClickListener {
+                showRemoveGameConfirmation(game)
+            }
+        }
+        cardContent.addView(removeButton)
+        
+        gameCard.addView(cardContent)
+        gamesContainer.addView(gameCard)
     }
     
     /**
@@ -391,7 +447,7 @@ class GamesActivity : AppCompatActivity() {
             text = category
             textSize = 20f
             setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(resources.getColor(android.R.color.holo_blue_dark))
+            setTextColor(resources.getColor(android.R.color.holo_blue_dark, theme))
         }
         gamesContainer.addView(headerView)
         
@@ -409,61 +465,48 @@ class GamesActivity : AppCompatActivity() {
     }
     
     /**
-     * Shows a confirmation dialog for removing a game that requires username verification
+     * Shows a confirmation dialog for removing a game
      */
-    private fun showRemoveGameConfirmation(gameName: String, savedUsername: String) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_confirm_remove_game, null)
-        val usernameInput = dialogView.findViewById<EditText>(R.id.editTextConfirmUsername)
-        
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Remove $gameName")
-            .setMessage("To confirm removal, please enter your username for this game")
-            .setView(dialogView)
-            .setPositiveButton("Remove") { _, _ -> 
-                val enteredUsername = usernameInput.text.toString()
-                if (enteredUsername == savedUsername) {
-                    // Username matched, remove the game
-                    removeGame(gameName, savedUsername)
-                    Toast.makeText(this, "$gameName removed successfully", Toast.LENGTH_SHORT).show()
-                    // Reload the games list
-                    loadSavedGames()
-                } else {
-                    Toast.makeText(this, "Username doesn't match. Game not removed.", Toast.LENGTH_SHORT).show()
-                }
+    private fun showRemoveGameConfirmation(game: Game) {
+        AlertDialog.Builder(this)
+            .setTitle("Remove ${game.name}")
+            .setMessage("Are you sure you want to remove ${game.name} (${game.username})?")
+            .setPositiveButton("Remove") { _, _ ->
+                removeGameFromSupabase(game)
             }
             .setNegativeButton("Cancel", null)
             .create()
-        
-        dialog.show()
+            .show()
     }
     
     /**
-     * Remove a game from SharedPreferences
+     * Remove a game from Supabase database
      */
-    private fun removeGame(gameName: String, username: String) {
-        val sharedPrefs = getSharedPreferences("user_games", Context.MODE_PRIVATE)
-        val gamesJson = sharedPrefs.getString("games", "[]") ?: "[]"
+    private fun removeGameFromSupabase(game: Game) {
+        // Show loading indicator
+        progressBar.visibility = View.VISIBLE
         
-        try {
-            val gamesArray = JSONArray(gamesJson)
-            val newGamesArray = JSONArray()
-            
-            // Copy all games except the one to be removed
-            for (i in 0 until gamesArray.length()) {
-                val game = gamesArray.getJSONObject(i)
-                val name = game.getString("name")
-                val gameUsername = game.getString("username")
+        lifecycleScope.launch {
+            try {
+                val success = SupabaseManager.deleteGame(game.id)
                 
-                // Keep this game if it doesn't match the one to be removed
-                if (name != gameName || gameUsername != username) {
-                    newGamesArray.put(game)
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    
+                    if (success) {
+                        Toast.makeText(this@GamesActivity, "${game.name} removed successfully", Toast.LENGTH_SHORT).show()
+                        // Reload games from Supabase
+                        loadUserGames()
+                    } else {
+                        Toast.makeText(this@GamesActivity, "Failed to remove game", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    Toast.makeText(this@GamesActivity, "Error removing game: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
-            
-            // Save updated array
-            sharedPrefs.edit().putString("games", newGamesArray.toString()).apply()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error removing game: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }

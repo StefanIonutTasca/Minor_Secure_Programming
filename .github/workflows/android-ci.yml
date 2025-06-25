@@ -2,9 +2,9 @@ name: Android CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, development ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, development ]
   workflow_dispatch:
 
 jobs:
@@ -51,12 +51,27 @@ jobs:
           path: build/reports/detekt/
           if-no-files-found: ignore
 
-      # MobSF action temporarily disabled due to availability issues
-      #- name: MobSF Security Analysis
-      #  uses: MobSF/mobsfscan-action@main
-      #  with:
-      #    output-format: json
-      #    output-file: mobsf-results.json
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install MobSF Scanner
+        run: |
+          pip install mobsfscan
+        continue-on-error: true
+        
+      - name: Run MobSF Scan
+        run: |
+          mobsfscan . --json --output mobsfscan-results.json
+        continue-on-error: true
+        
+      - name: Upload MobSF results
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobsf-scan-results
+          path: mobsfscan-results.json
+          if-no-files-found: ignore
 
   static-analysis:
     name: Static Code Analysis
@@ -160,7 +175,6 @@ jobs:
         run: |
           export JAVA_HOME=$JAVA_HOME_17_X64
           ./gradlew assembleDebug
-        continue-on-error: true
 
       - name: Upload Debug Artifacts
         uses: actions/upload-artifact@v4
@@ -202,6 +216,194 @@ jobs:
           merge-multiple: true
         continue-on-error: true
           
+      - name: Download MobSF Results
+        uses: actions/download-artifact@v4
+        with:
+          name: mobsf-scan-results
+          path: security-dashboard/mobsf
+          merge-multiple: true
+        continue-on-error: true
+        
+      - name: Parse MobSF Results to HTML
+        run: |
+          # Create a Python script to parse the JSON and generate HTML
+          cat > parse_mobsf.py << 'EOF'
+          import json
+          import os
+          import sys
+          from datetime import datetime
+          
+          def severity_color(severity):
+              if severity == "ERROR":
+                  return "#ff5252"
+              elif severity == "WARNING":
+                  return "#ffab40"
+              else:
+                  return "#4caf50"
+              
+          def severity_badge(severity):
+              colors = {
+                  "ERROR": "#ff5252",
+                  "WARNING": "#ffab40",
+                  "INFO": "#2196f3"
+              }
+              return f'<span style="background-color: {colors.get(severity, "#2196f3")}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px;">{severity}</span>'
+          
+          # Check if the mobsf results exist
+          mobsf_json_path = "security-dashboard/mobsf/mobsfscan-results.json"
+          if not os.path.exists(mobsf_json_path):
+              print("MobSF results file not found.")
+              sys.exit(1)
+          
+          # Load the MobSF JSON results
+          with open(mobsf_json_path, 'r') as f:
+              try:
+                  data = json.load(f)
+              except json.JSONDecodeError:
+                  print("Error decoding MobSF JSON file.")
+                  sys.exit(1)
+          
+          # Create HTML output
+          html_output = f'''
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <meta charset="UTF-8">
+              <title>MobSF Security Scan Results</title>
+              <style>
+                  body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
+                  h1 {{ color: #336699; text-align: center; margin-bottom: 30px; }}
+                  h2 {{ color: #444; border-bottom: 1px solid #ddd; padding-bottom: 10px; }}
+                  .issue-card {{ background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
+                  .issue-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }}
+                  .issue-title {{ font-size: 18px; font-weight: bold; color: #333; }}
+                  .issue-meta {{ color: #666; margin: 5px 0; }}
+                  .issue-files {{ background-color: #f0f0f0; border-radius: 4px; padding: 10px; margin-top: 10px; }}
+                  .issue-file {{ font-family: monospace; margin: 5px 0; }}
+                  .issue-match {{ background-color: #ffe0e0; padding: 2px; }}
+                  .summary {{ background-color: #e9f0f7; padding: 15px; border-radius: 8px; margin-bottom: 20px; }}
+                  .summary-item {{ margin: 8px 0; }}
+                  .back-link {{ display: inline-block; margin: 20px 0; padding: 10px 15px; background-color: #336699; color: white; text-decoration: none; border-radius: 4px; }}
+                  .back-link:hover {{ background-color: #254e77; }}
+              </style>
+          </head>
+          <body>
+              <h1>MobSF Security Scan Results</h1>
+              
+              <div class="summary">
+                  <h2>Summary</h2>
+          '''
+          
+          # Count issues by severity
+          error_count = 0
+          warning_count = 0
+          info_count = 0
+          
+          for issue_key, issue_data in data.get('results', {}).items():
+              severity = issue_data.get('metadata', {}).get('severity', '').upper()
+              if severity == "ERROR":
+                  error_count += 1
+              elif severity == "WARNING":
+                  warning_count += 1
+              elif severity == "INFO":
+                  info_count += 1
+          
+          # Add summary information
+          html_output += f'''
+                  <div class="summary-item"><strong>Scan Date:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
+                  <div class="summary-item"><strong>MobSF Scanner Version:</strong> {data.get('mobsfscan_version', 'Unknown')}</div>
+                  <div class="summary-item"><strong>Total Issues:</strong> {error_count + warning_count + info_count}</div>
+                  <div class="summary-item"><strong>Critical Issues:</strong> {error_count} {severity_badge("ERROR")}</div>
+                  <div class="summary-item"><strong>Warning Issues:</strong> {warning_count} {severity_badge("WARNING")}</div>
+                  <div class="summary-item"><strong>Info Issues:</strong> {info_count} {severity_badge("INFO")}</div>
+                  <div class="summary-item"><a href="mobsfscan-results.json" target="_blank">Download Raw JSON</a></div>
+              </div>
+          '''
+          
+          # Display each finding
+          html_output += '<h2>Detailed Findings</h2>\n'
+          
+          # Sort issues by severity (ERROR first, then WARNING, then INFO)
+          def severity_sort_key(item):
+              severity_order = {"ERROR": 0, "WARNING": 1, "INFO": 2}
+              severity = item[1].get('metadata', {}).get('severity', '').upper()
+              return severity_order.get(severity, 3)
+          
+          sorted_issues = sorted(data.get('results', {}).items(), key=severity_sort_key)
+          
+          for issue_key, issue_data in sorted_issues:
+              metadata = issue_data.get('metadata', {})
+              severity = metadata.get('severity', '').upper()
+              
+              html_output += f'''
+              <div class="issue-card">
+                  <div class="issue-header">
+                      <div class="issue-title">{issue_key.replace('android_', '').replace('_', ' ').title()}</div>
+                      {severity_badge(severity)}
+                  </div>
+                  <div class="issue-meta"><strong>Description:</strong> {metadata.get('description', 'No description')}</div>
+                  <div class="issue-meta"><strong>OWASP Mobile:</strong> {metadata.get('owasp-mobile', 'Not specified')}</div>
+                  <div class="issue-meta"><strong>MASVS:</strong> {metadata.get('masvs', 'Not specified')}</div>
+                  <div class="issue-meta"><strong>CWE:</strong> {metadata.get('cwe', 'Not specified')}</div>
+              '''
+              
+              # Add affected files if any
+              files = issue_data.get('files', [])
+              if files:
+                  html_output += f'''
+                  <div class="issue-files">
+                      <strong>Affected Files:</strong>
+                  '''
+                  
+                  for file_info in files:
+                      file_path = file_info.get('file_path', '').split('Minor_Secure_Programming/')[-1] if 'Minor_Secure_Programming/' in file_info.get('file_path', '') else file_info.get('file_path', '')
+                      match_string = file_info.get('match_string', '')
+                      match_lines = file_info.get('match_lines', [])
+                      
+                      if match_lines and len(match_lines) >= 2:
+                          line_info = f"Line {match_lines[0]}"
+                      else:
+                          line_info = ""
+                      
+                      html_output += f'''
+                      <div class="issue-file">
+                          {file_path} {line_info}
+                          {f'<div class="issue-match">Match: {match_string}</div>' if match_string else ''}
+                      </div>
+                      '''
+                  
+                  html_output += '</div>\n'
+              
+              # Add reference link
+              reference = metadata.get('reference', '')
+              if reference:
+                  html_output += f'<div class="issue-meta"><strong>Reference:</strong> <a href="{reference}" target="_blank">{reference}</a></div>\n'
+              
+              html_output += '</div>\n'
+          
+          # Footer
+          html_output += '''
+              <a href="../index.html" class="back-link">Back to Security Dashboard</a>
+          </body>
+          </html>
+          '''
+          
+          # Write the HTML file
+          with open("security-dashboard/mobsf/mobsf-report.html", 'w') as f:
+              f.write(html_output)
+          
+          print("MobSF HTML report generated successfully.")
+          EOF
+          
+          # Run the Python script if the MobSF results exist
+          if [ -f security-dashboard/mobsf/mobsfscan-results.json ]; then
+            python parse_mobsf.py
+            echo "MobSF HTML report created successfully"
+          else
+            echo "MobSF JSON results not found, skipping HTML generation"
+          fi
+        continue-on-error: true
+          
       - name: Download Test Results
         uses: actions/download-artifact@v4
         with:
@@ -238,6 +440,7 @@ jobs:
               <h3>Available Reports:</h3>
               <a class="report-link" href="./dependency-check/dependency-check-report.html">OWASP Dependency Check Report</a>
               <a class="report-link" href="./detekt/detekt.html">Detekt Security Analysis Report</a>
+              <a class="report-link" href="./mobsf/mobsf-report.html">MobSF Security Scan Report</a>
             </div>
             
             <div class="report-section">

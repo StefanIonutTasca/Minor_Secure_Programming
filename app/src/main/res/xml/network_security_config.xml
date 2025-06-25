@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Production domain configuration with certificate pinning for backend -->
+    <domain-config>
+        <domain includeSubdomains="true">minor-secure-programming-backend.onrender.com</domain>
+        <pin-set expiration="2030-01-01">
+            <!-- Add SHA-256 hash of your backend's certificate here -->
+            <!-- Example (you should replace with your actual certificate hash): -->
+            <!-- <pin digest="SHA-256">YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=</pin> -->
+            <!-- Backup pin (required) -->
+            <!-- <pin digest="SHA-256">YmFja3VwcGluMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY=</pin> -->
+        </pin-set>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+    
+    <!-- Supabase domain configuration -->
+    <domain-config>
+        <domain includeSubdomains="true">nevvbfvsrqertmwgvhlw.supabase.co</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+    
+    <!-- Development/testing configuration - only use for development -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+    
+    <!-- Allow cleartext traffic to local development server only -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+    
+    <!-- Base configuration - no cleartext traffic allowed -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

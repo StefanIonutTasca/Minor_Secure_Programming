@@ -8,9 +8,12 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
+import com.example.minor_secure_programming.utils.SupabaseManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.cardview.widget.CardView
+import kotlinx.coroutines.launch
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -70,7 +73,40 @@ class SettingsActivity : AppCompatActivity() {
 
         // Logout button
         findViewById<Button>(R.id.btnLogout).setOnClickListener {
-            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
+            // Show loading feedback
+            val logoutButton = findViewById<Button>(R.id.btnLogout)
+            logoutButton.isEnabled = false
+            logoutButton.text = "Logging out..."
+            
+            // Launch coroutine to call sign out function
+            lifecycleScope.launch {
+                val result = SupabaseManager.signOut()
+                
+                // Handle result on main thread
+                runOnUiThread {
+                    if (result.isSuccess) {
+                        Toast.makeText(this@SettingsActivity, "Successfully logged out", Toast.LENGTH_SHORT).show()
+                        
+                        // Clear any saved user data
+                        getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                            .edit()
+                            .clear()
+                            .apply()
+                        
+                        // Navigate back to login screen
+                        val intent = Intent(this@SettingsActivity, SignupLoginActivity::class.java)
+                        // Clear back stack so user can't navigate back after logout
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        // Show error and re-enable the button
+                        Toast.makeText(this@SettingsActivity, "Error logging out: ${result.exceptionOrNull()?.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                        logoutButton.isEnabled = true
+                        logoutButton.text = "Log out"
+                    }
+                }
+            }
         }
 
 
